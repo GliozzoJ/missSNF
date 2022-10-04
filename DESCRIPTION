@@ -1,12 +1,24 @@
 Package: missSNF
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Similarity Network Fusion (SNF) algorithm with missing data
+Version: 1.0.0
+Author@R: c(
+    person("Jessica", "Gliozzo", email = "jessica.gliozzo@unimi.it", role = c("aut", "cre")), 
+    person("Giorgio", "Valentini", email = "valentini@di.unimi.it", role = "aut"),
+    person("Elena", "Casiraghi", email = "elena.casiraghi@unimi.it", role = "aut"))
+Maintainer: Jessica Gliozzo <jessica.gliozzo@unimi.it>
+Description: Implementation of miss-SNF, a modification of the algorithm Similarity Network
+    Fusion (https://doi.org/10.1038/nmeth.2810) to handle the absence
+    (complete or nearly complete) of a specific data modality.
+    In particular, two strategies to implement missSNF are considered:
+    \itemize{
+    \item "reconstruct" can partially reconstruct missing
+    data by using information from different sources
+    \item "ignore" which simply ignores missing data during the integration 
+    process.
+License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports: SNFtool
+Imports: SNFtool, NetInt, mathjaxr
+RoxygenNote: 7.2.0
+RdMacros: mathjaxr
