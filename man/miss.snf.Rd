@@ -9,7 +9,7 @@ miss.snf(
   sims,
   mode = "reconstruct",
   perc.na = 0.2,
-  miss.symbol = NULL,
+  miss.symbols = NULL,
   K = 20,
   t = 20,
   impute = "median",
@@ -30,8 +30,8 @@ similarity measures to apply to the matrices in Mall.
 
 \item{perc.na}{percentage of NAs above which patient is considered missing.}
 
-\item{miss.symbol}{if not NULL, the provided symbol in matrices is converted
-to NA.}
+\item{miss.symbols}{vector of strings. If not NULL, the provided symbols
+in matrices are converted to NA.}
 
 \item{K}{Number of neighbors in K-nearest neighbors part of the algorithm.}
 
@@ -66,6 +66,7 @@ nearly complete) of a specific data source for a given patient by:
 \examples{
 
 # Create list of imput matrices
+set.seed(123);
 M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 rownames(M1) <- paste0("ID_", 1:nrow(M1));
 M1[1, 1:4] <- c(NA, NA, NA, NA);

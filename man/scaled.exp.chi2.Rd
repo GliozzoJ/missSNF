@@ -7,7 +7,7 @@
 scaled.exp.chi2(M, kk = 20, sigma = 0.5)
 }
 \arguments{
-\item{M}{matrix (samples x features)}
+\item{M}{matrix/dataframe (samples x features).}
 
 \item{kk}{integer. Number of nearest neighbours to sparsify similarity.}
 
@@ -18,6 +18,18 @@ similarity matrix computed using scaled exponential chi-square
         distance.
 }
 \description{
-it is a wrapper function to directly compute the scaled
+It is a wrapper function to directly compute the scaled
 exponential chi-square distance as implemented in SNFtool library.
+}
+\examples{
+
+# Create a matrix
+set.seed(123);
+M1 <- rbind(c(1,2,1,1,1,2,2), c(2,2,2,1,1,1,1), c(1,2,1,2,1,2,1),
+           c(2,2,2,1,2,1,2));
+
+rownames(M1) <- paste0("ID_", 1:nrow(M1));
+
+# Compute similarity matrix
+sim <- scaled.exp.chi2(M1, kk=3);
 }

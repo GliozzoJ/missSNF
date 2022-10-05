@@ -7,7 +7,7 @@
 scaled.exp.euclidean(M, kk = 20, sigma = 0.5)
 }
 \arguments{
-\item{M}{matrix (samples x features)}
+\item{M}{matrix/dataframe (samples x features).}
 
 \item{kk}{integer. Number of nearest neighbours to sparsify similarity.}
 
@@ -18,11 +18,23 @@ similarity matrix computed using scaled exponential euclidean
         distance.
 }
 \description{
-it is a wrapper function to directly compute the scaled
+It is a wrapper function to directly compute the scaled
 exponential euclidean distance as implemented in SNFtool library.
-# NOTE: from SNFtool "If the data is continuous, we recommend to use
-the function "dist2" as follows"
+
+NOTE: from SNFtool "If the data is continuous, we recommend to use
+the function dist2 as follows:"
+
 dist <- (dist2(as.matrix(Data1),as.matrix(Data1)))^(1/2);
-NOTE: this is because the function dist2 actually computes the squared
-      euclidean distance (without the square root).
+
+This is because the function dist2 actually computes the squared
+euclidean distance (without the square root).
+}
+\examples{
+# Create a matrix
+set.seed(123);
+M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
+rownames(M1) <- paste0("ID_", 1:nrow(M1));
+
+# Compute similarity matrix
+sim <- scaled.exp.euclidean(M1, kk=3, sigma=0.5);
 }

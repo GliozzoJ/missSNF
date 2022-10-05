@@ -4,24 +4,58 @@
 \alias{get.miss.pts}
 \title{Get list of missing patients for each matrix}
 \usage{
-get.miss.pts(Mall, perc.na = 0.2, miss.symbol = NULL)
+get.miss.pts(Mall, perc.na = 0.2, miss.symbols = NULL)
 }
 \arguments{
 \item{Mall}{list of named matrices/dataframes (samples x features).}
 
 \item{perc.na}{percentage of NAs above which patient is considered missing.}
 
-\item{miss.symbol}{if not NULL, the provided symbol in matrices is converted
-to NA.}
+\item{miss.symbols}{vector of strings. If not NULL, the provided symbols in
+dataframes is converted to NA.}
 }
 \value{
 list of vectors. Each vector contains the indices of missing samples
-        in a specific matrix.
+        in a specific matrix/dataframe.
 }
 \description{
-This function takes in input a list of matrices Mall and returns
-for each matrix the list of patients that are missing (considering the union
-of patients in all matrices). A patient is considered "missing" if (I) it is
-present in the matrix but has |NA| > perc.na, (II) a patient is not present
-in one matrix but is present in at least one of the others.
+This function takes in input a list of matrices/dataframes Mall
+and returns for each one the list of patients that are missing (considering
+the union of patients in all matrices). A patient is considered "missing"
+if (I) it is present in the matrix but has |NA| > perc.na, (II) a patient is
+not present in one matrix but it is present in at least one of the others.
+}
+\examples{
+
+# Create list of imput matrices
+set.seed(123);
+M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
+rownames(M1) <- paste0("ID_", 1:nrow(M1));
+M1[1, 1:4] <- c(NA, NA, NA, NA);
+M1[4, ] <- rep(NA, ncol(M1));
+
+M2 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
+rownames(M2) <- paste0("ID_", 3:10);
+M2[2, ] <- rep(NA, ncol(M2));
+M2[4, ] <- rep(NA, ncol(M2));
+M2[8, 1] <- NA;
+
+M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
+rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
+M3[4, 1] <- NA;
+M3[7, 1:8] <- rep(NA, 8);
+
+Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
+
+# Call function
+
+miss.pts <- get.miss.pts(Mall, perc.na=0.2, miss.symbols=NULL);
+
+# If missing values are encoded with some symbols (e.g. "?"),
+# the function can take this situation into account
+
+M3[1, 3:4] <- "?"
+Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
+
+miss.pts <- get.miss.pts(Mall, perc.na=0.2, miss.symbols=c("?"));
 }
