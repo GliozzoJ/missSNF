@@ -20,8 +20,8 @@
 #'             "reconstruct", otherwise ignore them during integration using
 #'             "ignore".
 #' @param perc.na percentage of NAs above which patient is considered missing.
-#' @param miss.symbol if not NULL, the provided symbol in matrices is converted
-#'                    to NA.
+#' @param miss.symbols vector of strings. If not NULL, the provided symbols
+#'                     in matrices are converted to NA.
 #' @param K Number of neighbors in K-nearest neighbors part of the algorithm.
 #' @param t Number of iterations for the diffusion process.
 #' @param impute string. Kind of imputation method to apply in case of samples
@@ -40,6 +40,7 @@
 #' @examples
 #'
 #' # Create list of imput matrices
+#' set.seed(123);
 #' M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 #' rownames(M1) <- paste0("ID_", 1:nrow(M1));
 #' M1[1, 1:4] <- c(NA, NA, NA, NA);
@@ -66,7 +67,7 @@
 #' W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="ignore",
 #'                K=3, kk=2);
 miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
-                     miss.symbol=NULL, K=20, t=20, impute="median", ...) {
+                     miss.symbols=NULL, K=20, t=20, impute="median", ...) {
 
 
     # Check that a similarity measures is provided for each matrix
@@ -77,29 +78,36 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     }
 
     # Get list of missing patients for each matrix
-    miss.pts <- get.miss.pts(Mall, perc.na=perc.na, miss.symbol=miss.symbol);
+    miss.pts <- get.miss.pts(Mall, perc.na=perc.na, miss.symbols=miss.symbols);
 
-    # Convert miss.symbol to NA
-    if(!is.null(miss.symbol)){
+    # Convert miss.symbols to NA
+    if(!is.null(miss.symbols)){
         for(i in 1:length(Mall)){
-            Mall[[i]][Mall[[i]] == miss.symbol] <- NA;
+            for(j in 1:length(miss.symbols)){
+                Mall[[i]][Mall[[i]] == miss.symbols[j]] <- NA;
+            }
         }
     }
 
+    # Convert Mall elements to matrix
+    for (i in 1:length(Mall)){
+        Mall[[i]] <- as.matrix(Mall[[i]]);
+        class(Mall[[i]]) <- "numeric";
+    }
+
     # Impute patients' features with NAs
-    if(impute == "median"){
+    if(is.null(impute)){
+        if(perc.na != 0){
+
+            stop("miss.snf: set perc.na=0 to remove patients having NAs and avoid imputation.")
+        }
+    }else if(impute == "median"){
         for(i in 1:length(Mall)){
             Mall[[i]] <- apply(Mall[[i]], 2, function(x) ifelse(is.na(x), median(x, na.rm=T), x))
         }
     } else if(impute == "mean"){
         for(i in 1:length(Mall)){
             Mall[[i]] <- apply(Mall[[i]], 2, function(x) ifelse(is.na(x), mean(x, na.rm=T), x))
-        }
-    } else if(is.null(impute)){
-
-        if(perc.na != 0){
-
-            stop("miss.snf: set perc.na=0 to remove patients having NAs and avoid imputation.")
         }
     }
 
@@ -109,8 +117,13 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
         idx.miss.pts <- which(rownames(Mall[[i]]) %in% miss.pts[[i]]); #idx patients with NAs
         sim.fun <- get(sims[[i]]);
-        Wall[[i]] <- sim.fun(Mall[[i]][-idx.miss.pts, ], ...);
 
+        # Handle presence of matrices without patients to remove for NAs
+        if(length(idx.miss.pts) != 0){
+            Wall[[i]] <- sim.fun(Mall[[i]][-idx.miss.pts, ], ...);
+        } else{
+            Wall[[i]] <- sim.fun(Mall[[i]], ...);
+        }
     }
 
     # Align networks replacing missing patients with 0
@@ -206,9 +219,8 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
         newW[[i]] <- (SNFtool:::.dominateset(Wall[[i]], K))
 
         if (mode == "ignore"){
-            # Set to zero rows/columns of missing patients
+            # Set to zero rows of missing patients
             newW[[i]][idx.miss.aligned[[i]], ] <- rep(0, ncol(newW[[i]]));
-            newW[[i]][, idx.miss.aligned[[i]]] <- rep(0, ncol(newW[[i]]));
         }
     }
 
@@ -255,24 +267,36 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
 #' Scaled exponential euclidean distance
 #'
-#' @description it is a wrapper function to directly compute the scaled
+#' @description It is a wrapper function to directly compute the scaled
 #' exponential euclidean distance as implemented in SNFtool library.
-#' # NOTE: from SNFtool "If the data is continuous, we recommend to use
-#' the function "dist2" as follows"
-#' dist <- (dist2(as.matrix(Data1),as.matrix(Data1)))^(1/2);
-#' NOTE: this is because the function dist2 actually computes the squared
-#'       euclidean distance (without the square root).
 #'
-#' @param M matrix (samples x features)
+#' NOTE: from SNFtool "If the data is continuous, we recommend to use
+#' the function dist2 as follows:"
+#'
+#' dist <- (dist2(as.matrix(Data1),as.matrix(Data1)))^(1/2);
+#'
+#' This is because the function dist2 actually computes the squared
+#' euclidean distance (without the square root).
+#'
+#' @param M matrix/dataframe (samples x features).
 #' @param kk integer. Number of nearest neighbours to sparsify similarity.
 #' @param sigma numeric. Variance for local model.
 #'
 #' @return similarity matrix computed using scaled exponential euclidean
 #'         distance.
 #' @export
+#'
+#' @examples
+#' # Create a matrix
+#' set.seed(123);
+#' M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
+#' rownames(M1) <- paste0("ID_", 1:nrow(M1));
+#'
+#' # Compute similarity matrix
+#' sim <- scaled.exp.euclidean(M1, kk=3, sigma=0.5);
 scaled.exp.euclidean <- function(M, kk=20, sigma=0.5){
 
-    dist <- (SNFtool::dist2(M, M))^(1/2);
+    dist <- (SNFtool::dist2(as.matrix(M), as.matrix(M)))^(1/2);
     sim <- SNFtool::affinityMatrix(dist, K=kk, sigma=sigma);
 
     return(sim)
@@ -282,16 +306,28 @@ scaled.exp.euclidean <- function(M, kk=20, sigma=0.5){
 
 #' Scaled exponential chi-square distance
 #'
-#' @description it is a wrapper function to directly compute the scaled
+#' @description It is a wrapper function to directly compute the scaled
 #' exponential chi-square distance as implemented in SNFtool library.
 #'
-#' @param M matrix (samples x features)
+#' @param M matrix/dataframe (samples x features).
 #' @param kk integer. Number of nearest neighbours to sparsify similarity.
 #' @param sigma numeric. Variance for local model.
 #'
 #' @return similarity matrix computed using scaled exponential chi-square
 #'         distance.
 #' @export
+#'
+#' @examples
+#'
+#' # Create a matrix
+#' set.seed(123);
+#' M1 <- rbind(c(1,2,1,1,1,2,2), c(2,2,2,1,1,1,1), c(1,2,1,2,1,2,1),
+#'            c(2,2,2,1,2,1,2));
+#'
+#' rownames(M1) <- paste0("ID_", 1:nrow(M1));
+#'
+#' # Compute similarity matrix
+#' sim <- scaled.exp.chi2(M1, kk=3);
 scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 
     dist <- SNFtool::chiDist2(M);
@@ -307,21 +343,55 @@ scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 
 #' Get list of missing patients for each matrix
 #'
-#' @description This function takes in input a list of matrices Mall and returns
-#' for each matrix the list of patients that are missing (considering the union
-#' of patients in all matrices). A patient is considered "missing" if (I) it is
-#' present in the matrix but has |NA| > perc.na, (II) a patient is not present
-#' in one matrix but is present in at least one of the others.
+#' @description This function takes in input a list of matrices/dataframes Mall
+#' and returns for each one the list of patients that are missing (considering
+#' the union of patients in all matrices). A patient is considered "missing"
+#' if (I) it is present in the matrix but has |NA| > perc.na, (II) a patient is
+#' not present in one matrix but it is present in at least one of the others.
 #'
 #' @param Mall list of named matrices/dataframes (samples x features).
 #' @param perc.na percentage of NAs above which patient is considered missing.
-#' @param miss.symbol if not NULL, the provided symbol in matrices is converted
-#'                    to NA.
+#' @param miss.symbols vector of strings. If not NULL, the provided symbols in
+#'                     dataframes is converted to NA.
 #'
 #' @return list of vectors. Each vector contains the indices of missing samples
-#'         in a specific matrix.
+#'         in a specific matrix/dataframe.
 #' @export
-get.miss.pts <- function(Mall, perc.na=0.2, miss.symbol=NULL){
+#'
+#' @examples
+#'
+#' # Create list of imput matrices
+#' set.seed(123);
+#' M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
+#' rownames(M1) <- paste0("ID_", 1:nrow(M1));
+#' M1[1, 1:4] <- c(NA, NA, NA, NA);
+#' M1[4, ] <- rep(NA, ncol(M1));
+#'
+#' M2 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
+#' rownames(M2) <- paste0("ID_", 3:10);
+#' M2[2, ] <- rep(NA, ncol(M2));
+#' M2[4, ] <- rep(NA, ncol(M2));
+#' M2[8, 1] <- NA;
+#'
+#' M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
+#' rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
+#' M3[4, 1] <- NA;
+#' M3[7, 1:8] <- rep(NA, 8);
+#'
+#' Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
+#'
+#' # Call function
+#'
+#' miss.pts <- get.miss.pts(Mall, perc.na=0.2, miss.symbols=NULL);
+#'
+#' # If missing values are encoded with some symbols (e.g. "?"),
+#' # the function can take this situation into account
+#'
+#' M3[1, 3:4] <- "?"
+#' Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
+#'
+#' miss.pts <- get.miss.pts(Mall, perc.na=0.2, miss.symbols=c("?"));
+get.miss.pts <- function(Mall, perc.na=0.2, miss.symbols=NULL){
 
     # Check if matrices are named
     for (i in 1:length(Mall)){
@@ -330,10 +400,12 @@ get.miss.pts <- function(Mall, perc.na=0.2, miss.symbol=NULL){
         }
     }
 
-    # Convert miss.symbol into NA
-    if(!is.null(miss.symbol)){
+    # Convert miss.symbols into NA
+    if(!is.null(miss.symbols)){
         for(i in 1:length(Mall)){
-            Mall[[i]][Mall[[i]] == miss.symbol] <- NA;
+            for(j in 1:length(miss.symbols)){
+                Mall[[i]][Mall[[i]] == miss.symbols[j]] <- NA;
+            }
         }
     }
 
@@ -350,7 +422,7 @@ get.miss.pts <- function(Mall, perc.na=0.2, miss.symbol=NULL){
 
         # Get patients that are all NAs or NAs > perc.na
         n.na <- rowSums(is.na(Mall[[i]]));
-        pts.many.na <- rownames(Mall[[i]])[(n.na/ncol(Mall[[i]])) >= perc.na];
+        pts.many.na <- rownames(Mall[[i]])[(n.na/ncol(Mall[[i]])) > perc.na];
         miss.pts[[i]] <- c(miss.pts[[i]], pts.many.na);
     }
 
