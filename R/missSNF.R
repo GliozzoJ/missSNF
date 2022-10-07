@@ -153,46 +153,17 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     # FROM NOW ON STARTS SNF CODE
     ############################################################################
     ############################################################################
-    check_wall_names <- function(Wall){
-        # Checks if dimnames are consistent across all matrices in Wall
-        #   #Move to internal functions?
-        # Args:
-        #   Wall: List of matrices
-        # Returns:
-        #   logical: True/False indicator of dimnames equivalence
-        name_match <- function(names_A, names_B){
-            return(identical(dimnames(names_A), dimnames(names_B)))
-        }
 
-        return(all(unlist(lapply(Wall, FUN=name_match, Wall[[1]]))))
-    }
-
-    #Check if Wall names are consistent across all matrices in Wall
-    wall.name.check <- check_wall_names(Wall)
     wall.names <- dimnames(Wall[[1]])
-    if(!wall.name.check){
-        warning("Dim names not consistent across all matrices in Wall.
-            Returned matrix will have no dim names.")
-    }
 
     LW <- length(Wall)
-
-    #Normalization method for affinity matrices
-    normalize <- function(X){
-        row.sum.mdiag <- rowSums(X) - diag(X)
-        #If rowSumx(X) == diag(X), set row.sum.mdiag to 1 to avoid div by zero
-        row.sum.mdiag[row.sum.mdiag == 0] <- 1
-        X <- X/(2*(row.sum.mdiag))
-        diag(X) <- 0.5
-        return(X)
-    }
 
     #Normalize different networks to avoid scale problems.
     #### [J]: Wall after normalization contains "global" similarity matrices P
     newW <- vector("list", LW)
     nextW <- vector("list", LW)
     for(i in 1:LW){
-        Wall[[i]] <- normalize(Wall[[i]])
+        Wall[[i]] <- .normalize(Wall[[i]])
         Wall[[i]] <- (Wall[[i]] + t(Wall[[i]]))/2
 
         ### [J]: set diagonal to 1 if mode="reconctruct", 0 otherwise for missing
@@ -238,7 +209,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
         #Normalize each new obtained networks.
         for(j in 1 : LW){
-            Wall[[j]] <- normalize(nextW[[j]])
+            Wall[[j]] <- .normalize(nextW[[j]])
             Wall[[j]] <- (Wall[[j]] + t(Wall[[j]]))/2;
         }
     }
@@ -250,12 +221,11 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     }
 
     W <- W/LW
-    W <- normalize(W)
+    W <- .normalize(W)
     W <- (W + t(W)) / 2
 
-    if(wall.name.check){
-        dimnames(W) <- wall.names
-    }
+    # Assign names to matrix
+    dimnames(W) <- wall.names
 
     return(list(W=W, removed.pts=removed.pts))
 }
