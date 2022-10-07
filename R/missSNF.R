@@ -77,9 +77,6 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
              number of similarity measures provided.");
     }
 
-    # Get list of missing patients for each matrix
-    miss.pts <- get.miss.pts(Mall, perc.na=perc.na, miss.symbols=miss.symbols);
-
     # Convert miss.symbols to NA
     if(!is.null(miss.symbols)){
         for(i in 1:length(Mall)){
@@ -88,6 +85,9 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             }
         }
     }
+
+    # Get list of missing patients for each matrix
+    miss.pts <- get.miss.pts(Mall, perc.na=perc.na, miss.symbols=NULL);
 
     # Convert Mall elements to matrix
     for (i in 1:length(Mall)){
