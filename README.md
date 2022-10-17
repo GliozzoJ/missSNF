@@ -2,8 +2,8 @@
 
 ## Installation
 
-The ``miss-SNF'' package can be installed using devtools. Please
-follow this steps:
+The "miss-SNF" package can be installed using devtools. Please
+follow these steps:
 
 0. Download miss-SNF package from this repository.
 
@@ -25,7 +25,7 @@ library("devtools");
 install("./missSNF");
 ```
 
-4. Now miss-SNF can be used as a every R package:
+4. Now miss-SNF can be used as every R package:
 
 ```
 # Load package
