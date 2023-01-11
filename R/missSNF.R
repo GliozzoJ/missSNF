@@ -31,7 +31,8 @@
 #'
 #' @return A list with two elements:
 #' \itemize{
-#' \item W : integrated similarity matrix.
+#' \item W : integrated similarity matrix. Note that the order of the patients
+#' is different from the order of the original matrices.
 #' \item removed.pts : vector with names of removed patients (i.e. patients
 #' present only in one matrix of Mall and having too much NAs).
 #' }
@@ -69,6 +70,20 @@
 miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
                      miss.symbols=NULL, K=20, t=20, impute="median", ...) {
 
+    # Allow naming of mode as "one" or "zero"
+    # Possible values for mode: one/reconstruct or zero/ignore
+    if(mode == "one"){
+        mode <- "reconstruct"
+    }
+
+    if(mode == "zero"){
+        mode <- "ignore"
+    }
+
+    if(!(mode == "reconstruct" | mode == "ignore")){
+
+        stop("miss.snf: mode can be only one/reconstruct or zero/ignore.")
+    }
 
     # Check that a similarity measures is provided for each matrix
     if(length(Mall) != length(sims)){
@@ -182,7 +197,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     ### Calculate the local transition matrix. (KNN step?)
     #### [J]: newW contains the local transition matrices S
     #### [J]: since missing patients has no neighbours by design
-    #### (except for itself), in case of recostruction strategy the weights
+    #### (except for itself), in case of reconstruction strategy the weights
     #### are already set to zero and the diagonal to 1. However,
     #### if the strategy is "ignore", the computation leads to NaN
     #### (due to division by zero) for missing patients
@@ -220,7 +235,21 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
         W <- W + Wall[[i]]
     }
 
-    W <- W/LW
+    ### [J]: if we use miss-SNF ignore, division considers only the
+    ### actual number of available data sources
+    if(mode == "reconstruct"){
+        W <- W/LW
+    } else{
+        M <- simplify2array(Wall)
+        M[M > 0] <- 1 # [J]: create an indicator array
+        M <- rowSums(M, dims = 2) # [J]: count data sources
+        W <- W * (1/M)
+        W[is.nan(W)] <- 0 # [J]: replace NaN introduced with division by zero,
+                          # possible when pts i and j are no present in the
+                          # same data source, thus edge(i,j)=0 for each data source
+    }
+
+
     W <- .normalize(W)
     W <- (W + t(W)) / 2
 

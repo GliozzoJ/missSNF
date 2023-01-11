@@ -46,7 +46,8 @@ NOTE: if impute=NULL, then perc.na has to be 0.}
 \value{
 A list with two elements:
 \itemize{
-\item W : integrated similarity matrix.
+\item W : integrated similarity matrix. Note that the order of the patients
+is different from the order of the original matrices.
 \item removed.pts : vector with names of removed patients (i.e. patients
 present only in one matrix of Mall and having too much NAs).
 }
