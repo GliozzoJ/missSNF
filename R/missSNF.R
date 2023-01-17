@@ -202,7 +202,8 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### if the strategy is "ignore", the computation leads to NaN
     #### (due to division by zero) for missing patients
     for(i in 1:LW){
-        newW[[i]] <- (SNFtool:::.dominateset(Wall[[i]], K))
+        # NOTA: ho modificato qui Wall a Wall_aligned
+        newW[[i]] <- (SNFtool:::.dominateset(Wall_aligned[[i]], K))
 
         if (mode == "ignore"){
             # Set to zero rows of missing patients
