@@ -140,6 +140,10 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             Wall[[i]] <- sim.fun(Mall[[i]], ...);
         }
     }
+                               
+    # NOTE: Here Wall represent a list of the similrity function (either the scaled exponential similarity kernel 
+    # or the chi sqaure similarity kernel depending on the arguments of the parameter sims
+                               
 
     # Align networks replacing missing patients with 0
     Wall_aligned <- NetInt::lalign.networks(fill=0, Wall);
@@ -163,6 +167,8 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     }
 
     # Use Wall_aligned in SNF code
+    # NOTE: Wall_aligned represent the similarity kernel (either exponential or chi square depending on sims) where for the missing patients i
+    # (in reconstruct mode) Wall_aligned[][i,i] = 1
     Wall <- Wall_aligned;
 
     # FROM NOW ON STARTS SNF CODE
@@ -193,6 +199,8 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             diag(Wall[[i]])[idx.miss.aligned[[i]]] <- 0;
         }
     }
+                               
+    # NOTE: Wall here is the global similarity matrix P with Wall[][i,i]=1 in reconstruct mode for the completely missing patients i
 
     ### Calculate the local transition matrix. (KNN step?)
     #### [J]: newW contains the local transition matrices S
@@ -202,7 +210,10 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### if the strategy is "ignore", the computation leads to NaN
     #### (due to division by zero) for missing patients
     for(i in 1:LW){
-        newW[[i]] <- (SNFtool:::.dominateset(Wall[[i]], K))
+        # NOTA: ho modificato qui Wall a Wall_aligned
+        # NOTA: in modalita' "ignore" .dominateset porta ad una divisione per zero. Bisogna modificare .dominateset (come fa gia' .normalize)
+        # in modo che le righe che sommano a zero vegano portate a 1. QUindi bisogna portare .dominateset in missSNF ...
+        newW[[i]] <- (SNFtool:::.dominateset(Wall_aligned[[i]], K))
 
         if (mode == "ignore"){
             # Set to zero rows of missing patients
