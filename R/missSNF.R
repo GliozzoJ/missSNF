@@ -275,7 +275,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 #' dist <- (dist2(as.matrix(Data1),as.matrix(Data1)))^(1/2);
 #'
 #' This is because the function dist2 actually computes the squared
-#' euclidean distance (without the square root).
+#' euclidean distance (euclidean distance without the square root).
 #'
 #' @param M matrix/dataframe (samples x features).
 #' @param kk integer. Number of nearest neighbours to sparsify similarity.
@@ -353,7 +353,7 @@ scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 #' @param miss.symbols vector of strings. If not NULL, the provided symbols in
 #'                     dataframes is converted to NA.
 #'
-#' @return list of vectors. Each vector contains the indices of missing samples
+#' @return list of vectors. Each vector contains the names of missing samples
 #'         in a specific matrix/dataframe.
 #' @export
 #'
