@@ -27,6 +27,8 @@
 #' @param impute string. Kind of imputation method to apply in case of samples
 #'               with few missing values. Options are: NULL, "mean", "median".
 #'               NOTE: if impute=NULL, then perc.na has to be 0.
+#' @param d numeric. Set the diagonal of the matrix to "d" if
+#' mode="reconstruct" (def d=1).
 #' @param ... additional arguments for similarity measures.
 #'
 #' @return A list with two elements:
@@ -68,7 +70,8 @@
 #' W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="ignore",
 #'                K=3, kk=2);
 miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
-                     miss.symbols=NULL, K=20, t=20, impute="median", ...) {
+                     miss.symbols=NULL, K=20, t=20, impute="median",
+                     d=1, ...) {
 
     # Allow naming of mode as "one" or "zero"
     # Possible values for mode: one/reconstruct or zero/ignore
@@ -140,10 +143,11 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             Wall[[i]] <- sim.fun(Mall[[i]], ...);
         }
     }
-                               
-    # NOTE: Here Wall represent a list of the similrity function (either the scaled exponential similarity kernel 
-    # or the chi sqaure similarity kernel depending on the arguments of the parameter sims
-                               
+
+    # NOTE: Here Wall represent a list of the similarity function (either the scaled
+    # exponential similarity kernel or the chi square similarity kernel depending
+    # on the arguments of the parameter sims
+
 
     # Align networks replacing missing patients with 0
     Wall_aligned <- NetInt::lalign.networks(fill=0, Wall);
@@ -153,7 +157,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     removed.pts.tab <- table(unlist(miss.pts)) == length(Mall);
     removed.pts <- rownames(removed.pts.tab)[removed.pts.tab];
 
-    # Set diagonal of missing elements to 1 if "reconstruct" mode is used
+    # Set diagonal of missing elements to "d" if "reconstruct" mode is used
     # If "ignore" mode, missing patients are already set to vector of zeros
     idx.miss.aligned <- list();
     for(i in 1:length(Wall_aligned)){
@@ -161,13 +165,14 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
         idx.miss.aligned[[i]] <- idx;
         if(mode == "reconstruct"){
 
-            diag(Wall_aligned[[i]])[idx] <- 1;
+            diag(Wall_aligned[[i]])[idx] <- d;
 
         }
     }
 
     # Use Wall_aligned in SNF code
-    # NOTE: Wall_aligned represent the similarity kernel (either exponential or chi square depending on sims) where for the missing patients i
+    # NOTE: Wall_aligned represent the similarity kernel (either exponential or
+    # chi square depending on sims) where for the missing patients i
     # (in reconstruct mode) Wall_aligned[][i,i] = 1
     Wall <- Wall_aligned;
 
@@ -187,20 +192,21 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
         Wall[[i]] <- .normalize(Wall[[i]])
         Wall[[i]] <- (Wall[[i]] + t(Wall[[i]]))/2
 
-        ### [J]: set diagonal to 1 if mode="reconctruct", 0 otherwise for missing
+        ### [J]: set diagonal to d if mode="reconctruct", 0 otherwise for missing
         ### patients. The other elements for missing patients should remain zero
         ### even after normalization.
 
         if(mode == "reconstruct"){
 
-            diag(Wall[[i]])[idx.miss.aligned[[i]]] <- 1;
+            diag(Wall[[i]])[idx.miss.aligned[[i]]] <- d;
         } else {
 
             diag(Wall[[i]])[idx.miss.aligned[[i]]] <- 0;
         }
     }
-                               
-    # NOTE: Wall here is the global similarity matrix P with Wall[][i,i]=1 in reconstruct mode for the completely missing patients i
+
+    # NOTE: Wall here is the global similarity matrix P with Wall[][i,i]=1 in
+    # reconstruct mode for the completely missing patients i
 
     ### Calculate the local transition matrix. (KNN step?)
     #### [J]: newW contains the local transition matrices S
@@ -210,9 +216,10 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### if the strategy is "ignore", the computation leads to NaN
     #### (due to division by zero) for missing patients
     for(i in 1:LW){
-        # NOTA: ho modificato qui Wall a Wall_aligned
-        # NOTA: in modalita' "ignore" .dominateset porta ad una divisione per zero. Bisogna modificare .dominateset (come fa gia' .normalize)
-        # in modo che le righe che sommano a zero vegano portate a 1. QUindi bisogna portare .dominateset in missSNF ...
+        # NOTA: in modalita' "ignore" .dominateset porta ad una divisione per zero.
+        # Bisogna modificare .dominateset (come fa gia' .normalize)
+        # in modo che le righe che sommano a zero vnegano portate a 1. Quindi
+        # bisogna portare .dominateset in missSNF ...
         newW[[i]] <- (SNFtool:::.dominateset(Wall_aligned[[i]], K))
 
         if (mode == "ignore"){
