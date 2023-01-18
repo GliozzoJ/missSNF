@@ -40,7 +40,8 @@
 
 #' Local similarity matrix
 #'
-#' @description Computation of the local similarity matrix based on the first KNN elements.
+#' @description Computation of the local similarity matrix based on the first
+#' KNN elements.
 #' It is a modified version of the .dominateset function implemented in SNFtool
 #' library (https://cran.r-project.org/web/packages/SNFtool/index.html) to avoid
 #' division by zero when the "ignore" version of the miss-SNF algorithm is used.
