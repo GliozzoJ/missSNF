@@ -173,7 +173,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     # Use Wall_aligned in SNF code
     # NOTE: Wall_aligned represent the similarity kernel (either exponential or
     # chi square depending on sims) where for the missing patients i
-    # (in reconstruct mode) Wall_aligned[][i,i] = 1
+    # (in reconstruct mode) have values Wall_aligned[][i,i] = 1
     Wall <- Wall_aligned;
 
     # FROM NOW ON STARTS SNF CODE
@@ -216,9 +216,12 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### strategy, the weights are already set to zero (division by zero
     #### avoided by the function .localSimMat()).
     for(i in 1:LW){
-
-        newW[[i]] <- (.localSimMat(Wall_aligned[[i]], K))
-
+        newW[[i]] <- local.similarity.matrix(Wall_aligned[[i]], K);
+        
+        if (mode == "ignore"){
+            # Set to zero rows of missing patients
+            newW[[i]][idx.miss.aligned[[i]], ] <- rep(0, ncol(newW[[i]]));
+        }
     }
 
     #Perform the diffusion for t iterations
@@ -439,6 +442,51 @@ get.miss.pts <- function(Mall, perc.na=0.2, miss.symbols=NULL){
     return(miss.pts)
 }
 
+#' Local similarity matrix
+#'
+#' @description 
+#' Computation of the local similarity matrix based on the first KNN elements 
+#' It is a modified version of  the  .dominateset function implemented in SNFtool library to avoid 
+#' division by zero when the  "ignore" version of the missSNF algorithm is used
+#
+#'
+#' @param xx square matrix of pairwise similarities 
+#' @param KK integer. Number of nearest neighbours
+#'
+#' @return local similarity matrix
+#' @export
+#'
+#' @examples
+#' # Create a matrix
+#' set.seed(123);
+#' M1 <- matrix(runif(100, min = 0, max = 1), nrow = 10); # 10 samples
+#' rownames(M1) <- paste0("ID_", 1:nrow(M1));
+#'
+#' # Compute similarity matrix
+#' sim <- scaled.exp.euclidean(M1, kk=3, sigma=0.5);
+#' # Compute local similarity matrix
+#' loc.sim <- local.similarity.matrix(sim, 5);
+local.similarity.matrix <- function(xx,KK=20) {
+ 
+  zero <- function(x) {
+    s = sort(x, index.return=TRUE)
+    x[s$ix[1:(length(x)-KK)]] = 0
+    return(x)
+  }
+  
+  normalize <- function(X) {
+        row.sum <- rowSums(X);
+        row.sum[row.sum == 0] <- 1;
+        return(X / row.sum)
+  }
+              
+  A = matrix(0,nrow(xx),ncol(xx));
+  for(i in 1:nrow(xx)){
+    A[i,] = zero(xx[i,]);   
+  }
+   
+  return(normalize(A))
+}
 
 
 
