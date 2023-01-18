@@ -29,6 +29,11 @@
 #'               NOTE: if impute=NULL, then perc.na has to be 0.
 #' @param d numeric. Set the diagonal of the matrix to "d" if
 #' mode="reconstruct" (def d=1).
+#' @param random.walk string. Use 1-step Random Walk to compute the local
+#' similarity matrix S and/or p-step Random Walk to compute the global
+#' similarity matrix P. random.walk=c("global", "local", "both", "none") and
+#' defaults is random.walk="none".
+#' @param p numeric. Number of steps for the p-step RW.
 #' @param ... additional arguments for similarity measures.
 #'
 #' @return A list with two elements:
@@ -42,7 +47,7 @@
 #'
 #' @examples
 #'
-#' # Create list of imput matrices
+#' # Create list of input matrices
 #' set.seed(123);
 #' M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 #' rownames(M1) <- paste0("ID_", 1:nrow(M1));
@@ -71,7 +76,7 @@
 #'                K=3, kk=2);
 miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
                      miss.symbols=NULL, K=20, t=20, impute="median",
-                     d=1, ...) {
+                     d=1, random.walk="none", p=3, ...) {
 
     # Allow naming of mode as "one" or "zero"
     # Possible values for mode: one/reconstruct or zero/ignore
@@ -186,15 +191,32 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
     #Normalize different networks to avoid scale problems.
     #### [J]: Wall after normalization contains "global" similarity matrices P
+    #### [J]: Global similarity matrices can be computed by Wang's normalization
+    #### or by p-step Random Walk Kernel.
     newW <- vector("list", LW)
     nextW <- vector("list", LW)
     for(i in 1:LW){
-        Wall[[i]] <- .normalize(Wall[[i]])
+
+        if(random.walk == "global" | random.walk == "both"){
+
+            Wall[[i]] <- RANKS::rw.kernel(Wall[[i]])
+            Wall[[i]] <- RANKS::p.step.rw.kernel(Wall[[i]], p=p)
+            Wall[[i]] <- NetPreProc::Prob.norm(Wall[[i]]) # Normalization with unnormalized lagrangian
+
+        } else if(random.walk == "none"){
+
+            Wall[[i]] <- .normalize(Wall[[i]])
+
+        } else {
+            stop("miss.snf: random.walk can be only c('global', 'local',
+                 'both', 'none')")
+        }
+
         Wall[[i]] <- (Wall[[i]] + t(Wall[[i]]))/2
 
-        ### [J]: set diagonal to d if mode="reconctruct", 0 otherwise for missing
+        ### [J]: set diagonal to d if mode="reconstruct", 0 otherwise for missing
         ### patients. The other elements for missing patients should remain zero
-        ### even after normalization.
+        ### even after normalization or p-step Random Walk.
 
         if(mode == "reconstruct"){
 
@@ -215,13 +237,34 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### are already set to zero and the diagonal to 1. In case of ignore
     #### strategy, the weights are already set to zero (division by zero
     #### avoided by the function .local.similarity.matrix()).
+    #### [J]: local similarity matrix can be computed also by 1-step RW.
+    #### When using 1-step RW, all weights are set to zero except for the
+    #### diagonal.
     for(i in 1:LW){
-        newW[[i]] <- .local.similarity.matrix(Wall_aligned[[i]], K);
 
-        if (mode == "ignore"){
-            # Set to zero rows of missing patients
-            newW[[i]][idx.miss.aligned[[i]], ] <- rep(0, ncol(newW[[i]]));
+        if(random.walk == "local" | random.walk == "both"){
+
+            newW[[i]] <- RANKS::rw.kernel(Wall_aligned[[i]])
+            newW[[i]] <- NetPreProc::Prob.norm(newW[[i]]) # Normalization with unnormalized lagrangian
+
+        } else if (random.walk == "none"){
+
+            newW[[i]] <- .local.similarity.matrix(Wall_aligned[[i]], K);
+
+        } else {
+            stop("miss.snf: random.walk can be only c('global', 'local',
+                 'both', 'none')")
         }
+
+        # Set diagonal to d for mode reconstruct and 0 for mode ignore.
+        if(mode == "reconstruct"){
+
+            diag(newW[[i]])[idx.miss.aligned[[i]]] <- d;
+        } else {
+
+            diag(newW[[i]])[idx.miss.aligned[[i]]] <- 0;
+        }
+
     }
 
     #Perform the diffusion for t iterations

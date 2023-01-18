@@ -14,6 +14,8 @@ miss.snf(
   t = 20,
   impute = "median",
   d = 1,
+  random.walk = "none",
+  p = 3,
   ...
 )
 }
@@ -45,6 +47,13 @@ NOTE: if impute=NULL, then perc.na has to be 0.}
 \item{d}{numeric. Set the diagonal of the matrix to "d" if
 mode="reconstruct" (def d=1).}
 
+\item{random.walk}{string. Use 1-step Random Walk to compute the local
+similarity matrix S and/or p-step Random Walk to compute the global
+similarity matrix P. random.walk=c("global", "local", "both", "none") and
+defaults is random.walk="none".}
+
+\item{p}{numeric. Number of steps for the p-step RW.}
+
 \item{...}{additional arguments for similarity measures.}
 }
 \value{
@@ -70,7 +79,7 @@ nearly complete) of a specific data source for a given patient by:
 }
 \examples{
 
-# Create list of imput matrices
+# Create list of input matrices
 set.seed(123);
 M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 rownames(M1) <- paste0("ID_", 1:nrow(M1));
