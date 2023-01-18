@@ -38,10 +38,12 @@
 }
 
 
-#' Compute local similarity matrix
+#' Local similarity matrix
 #'
-#' @description This function computes the local similarity matrix that
-#' takes into account local affinity through K-Nearest Neighbor.
+#' @description Computation of the local similarity matrix based on the first KNN elements.
+#' It is a modified version of the .dominateset function implemented in SNFtool
+#' library (https://cran.r-project.org/web/packages/SNFtool/index.html) to avoid
+#' division by zero when the "ignore" version of the miss-SNF algorithm is used.
 #' It corresponds to the formula:
 #'
 #' \loadmathjax
@@ -52,18 +54,28 @@
 #' \end{cases}
 #'
 #' where $N_i = \{ x_k | x_k \in kNN(x_i) \cup \{ x_i \}\}$.
-#' Note: this function corresponds to the internal function ".dominateset" in
-#' SNFtool package (https://cran.r-project.org/web/packages/SNFtool/index.html)
-#' but we modified the normalization of the function to avoid division by zero
-#' when miss-SNF ZERO (i.e. mode="ignore") is used.
+#
 #'
-#' @param xx matrix. Similarity matrix.
-#' @param KK numeric. Number of neighbors in K-nearest neighbors.
+#' @param xx matrix. Square matrix of pairwise similarities.
+#' @param KK integer. Number of nearest neighbours.
 #'
 #' @return Local similarity matrix.
+#' @export
+#'
+#' @examples
+#' # Create a matrix
+#' set.seed(123);
+#' M1 <- matrix(runif(100, min = 0, max = 1), nrow = 10); # 10 samples
+#' rownames(M1) <- paste0("ID_", 1:nrow(M1));
+#'
+#' # Compute similarity matrix
+#' sim <- scaled.exp.euclidean(M1, kk=3, sigma=0.5);
+#' # Compute local similarity matrix
+#' loc.sim <- local.similarity.matrix(sim, 5);
+#'
 #' @keywords internal
 #' @noRd
-.localSimMat <- function(xx, KK=20) {
+.local.similarity.matrix <- function(xx,KK=20) {
 
     zero <- function(x) {
         s = sort(x, index.return=TRUE)
@@ -71,17 +83,11 @@
         return(x)
     }
 
-    # Modified "normalize" function to avoid division by
-    # zero for missing patients when mode="ignore"
     normalize <- function(X) {
-
-        rSums <- rowSums(X)
-        rSums[rSums == 0] <- 1
-        X <- X / rSums
-
-        return(X)
+        row.sum <- rowSums(X);
+        row.sum[row.sum == 0] <- 1;
+        return(X / row.sum)
     }
-
 
     A = matrix(0,nrow(xx),ncol(xx));
     for(i in 1:nrow(xx)){
@@ -90,8 +96,4 @@
 
     return(normalize(A))
 }
-
-
-
-
 
