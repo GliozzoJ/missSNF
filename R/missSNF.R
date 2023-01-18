@@ -212,20 +212,13 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
     #### [J]: newW contains the local transition matrices S
     #### [J]: since missing patients has no neighbours by design
     #### (except for itself), in case of reconstruction strategy the weights
-    #### are already set to zero and the diagonal to 1. However,
-    #### if the strategy is "ignore", the computation leads to NaN
-    #### (due to division by zero) for missing patients
+    #### are already set to zero and the diagonal to 1. In case of ignore
+    #### strategy, the weights are already set to zero (division by zero
+    #### avoided by the function .localSimMat()).
     for(i in 1:LW){
-        # NOTA: in modalita' "ignore" .dominateset porta ad una divisione per zero.
-        # Bisogna modificare .dominateset (come fa gia' .normalize)
-        # in modo che le righe che sommano a zero vnegano portate a 1. Quindi
-        # bisogna portare .dominateset in missSNF ...
-        newW[[i]] <- (SNFtool:::.dominateset(Wall_aligned[[i]], K))
 
-        if (mode == "ignore"){
-            # Set to zero rows of missing patients
-            newW[[i]][idx.miss.aligned[[i]], ] <- rep(0, ncol(newW[[i]]));
-        }
+        newW[[i]] <- (.localSimMat(Wall_aligned[[i]], K))
+
     }
 
     #Perform the diffusion for t iterations
