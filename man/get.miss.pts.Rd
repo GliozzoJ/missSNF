@@ -15,7 +15,7 @@ get.miss.pts(Mall, perc.na = 0.2, miss.symbols = NULL)
 dataframes is converted to NA.}
 }
 \value{
-list of vectors. Each vector contains the indices of missing samples
+list of vectors. Each vector contains the names of missing samples
         in a specific matrix/dataframe.
 }
 \description{

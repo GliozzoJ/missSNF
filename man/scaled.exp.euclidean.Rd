@@ -27,7 +27,7 @@ the function dist2 as follows:"
 dist <- (dist2(as.matrix(Data1),as.matrix(Data1)))^(1/2);
 
 This is because the function dist2 actually computes the squared
-euclidean distance (without the square root).
+euclidean distance (euclidean distance without the square root).
 }
 \examples{
 # Create a matrix

@@ -13,6 +13,7 @@ miss.snf(
   K = 20,
   t = 20,
   impute = "median",
+  d = 1,
   ...
 )
 }
@@ -40,6 +41,9 @@ in matrices are converted to NA.}
 \item{impute}{string. Kind of imputation method to apply in case of samples
 with few missing values. Options are: NULL, "mean", "median".
 NOTE: if impute=NULL, then perc.na has to be 0.}
+
+\item{d}{numeric. Set the diagonal of the matrix to "d" if
+mode="reconstruct" (def d=1).}
 
 \item{...}{additional arguments for similarity measures.}
 }
