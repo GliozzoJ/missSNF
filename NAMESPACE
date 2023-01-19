@@ -2,6 +2,7 @@
 
 export(.local.similarity.matrix)
 export(get.miss.pts)
+export(impute_miss)
 export(miss.snf)
 export(scaled.exp.chi2)
 export(scaled.exp.euclidean)

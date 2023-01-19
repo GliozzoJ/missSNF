@@ -124,14 +124,12 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
             stop("miss.snf: set perc.na=0 to remove patients having NAs and avoid imputation.")
         }
-    }else if(impute == "median"){
+    }else if(impute == "median" | impute == "mean"){
         for(i in 1:length(Mall)){
-            Mall[[i]] <- apply(Mall[[i]], 2, function(x) ifelse(is.na(x), median(x, na.rm=T), x))
+            Mall[[i]] <- impute_miss(Mall[[i]], perc.na=perc.na, method=impute)
         }
-    } else if(impute == "mean"){
-        for(i in 1:length(Mall)){
-            Mall[[i]] <- apply(Mall[[i]], 2, function(x) ifelse(is.na(x), mean(x, na.rm=T), x))
-        }
+    } else {
+        stop("miss.snf: imputation method can be only median or mean.")
     }
 
     # Compute similarity matrices W (without considering missing patients)
@@ -483,5 +481,40 @@ get.miss.pts <- function(Mall, perc.na=0.2, miss.symbols=NULL){
     }
 
     return(miss.pts)
+}
+
+
+#' Impute patients with few NAs
+#'
+#' @description This function imputes missing samples using some specified
+#' method (e.g. mean, median) only for patients/samples having a percentage
+#' of NAs lower or equal to perc.na. In other words, not all missing data are
+#' imputed but only the ones for which a patient has enough data to not be
+#' considered completely missing.
+#'
+#' @param data matrix. Matrix (samples x features).
+#' @param perc.na numeric. Percentage of missing features.
+#' @param method string. An imputation method (possible options mean, median).
+#'
+#' @return Imputed data matrix.
+#' @export
+impute_miss <- function(data, perc.na, method) {
+
+    # Retrieve imputation method
+    impute_func <- get(method)
+
+    # Get rows to impute (having few missing patients but not zero)
+    n_na <- apply(is.na(data), 1, sum)
+    idx_impute <- which(n_na/ncol(data) <= perc.na & n_na/ncol(data) != 0)
+
+    # Impute each column
+    for (p in idx_impute){
+        for(i in 1:ncol(data)){
+            bool <- is.na(data[p, ])
+            data[p, i] <- ifelse(bool[i], impute_func(data[, i], na.rm = TRUE), data[p, i])
+        }
+    }
+
+    return(data)
 }
 
