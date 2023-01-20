@@ -507,6 +507,10 @@ impute_miss <- function(data, perc.na, method) {
     n_na <- apply(is.na(data), 1, sum)
     idx_impute <- which(n_na/ncol(data) <= perc.na & n_na/ncol(data) != 0)
 
+    if(length(idx_impute) == 0){
+        message("impute_miss: no samples to impute are present.")
+    }
+
     # Impute each column
     for (p in idx_impute){
         for(i in 1:ncol(data)){
