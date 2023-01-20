@@ -72,7 +72,7 @@
 #' # Compute similarity matrix
 #' sim <- scaled.exp.euclidean(M1, kk=3, sigma=0.5);
 #' # Compute local similarity matrix
-#' loc.sim <- local.similarity.matrix(sim, 5);
+#' loc.sim <- missSNF::.local.similarity.matrix(sim, 5);
 #'
 #' @keywords internal
 #' @noRd
