@@ -28,10 +28,10 @@ similarity measures to apply to the matrices in Mall.
 "scaled.exp.chi2" is the scaled exponential chi-square distance}
 
 \item{mode}{string. If you want to partially reconstruct missing data use
-"reconstruct", otherwise ignore them during integration using
-"ignore".}
+"reconstruct" or "one", otherwise ignore them during integration
+using "ignore" or "zero".}
 
-\item{perc.na}{percentage of NAs above which patient is considered missing.}
+\item{perc.na}{percentage of NAs above which a patient is considered missing.}
 
 \item{miss.symbols}{vector of strings. If not NULL, the provided symbols
 in matrices are converted to NA.}
@@ -42,10 +42,11 @@ in matrices are converted to NA.}
 
 \item{impute}{string. Kind of imputation method to apply in case of samples
 with few missing values. Options are: NULL, "mean", "median".
-NOTE: if impute=NULL, then perc.na has to be 0.}
+NOTE: if impute=NULL, then perc.na has to be 0 (i.e.
+having even one NA will make the patient treated as missing).}
 
 \item{d}{numeric. Set the diagonal of the matrix to "d" if
-mode="reconstruct" (def d=1).}
+mode="reconstruct" or mode="one" (def d=1).}
 
 \item{random.walk}{string. Use 1-step Random Walk to compute the local
 similarity matrix S and/or p-step Random Walk to compute the global
@@ -62,7 +63,8 @@ A list with two elements:
 \item W : integrated similarity matrix. Note that the order of the patients
 is different from the order of the original matrices.
 \item removed.pts : vector with names of removed patients (i.e. patients
-present only in one matrix of Mall and having too much NAs).
+present only in one matrix of Mall and having too much NAs or, more in general,
+if a patient is considered missing in all data sources).
 }
 }
 \description{
@@ -72,9 +74,9 @@ nearly complete) of a specific data source for a given patient by:
 \loadmathjax
 \itemize{
 \item "reconstruct strategy" that can partially reconstruct missing
-  data by using information from different sources
+  data by using information from different sources (i.e. miss-SNF ONE).
 \item "ignore strategy" which simply ignores missing data during the integration
-  process
+  process (i.e. miss-SNF ZERO).
 }
 }
 \examples{
@@ -95,7 +97,7 @@ M2[8, 1] <- NA;
 M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
 rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
 M3[4, 1] <- NA;
-M3[7, 1:8] <- rep(NA, 8);
+M3[7, ] <- rep(NA, ncol(M3));
 
 Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 

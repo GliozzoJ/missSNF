@@ -27,7 +27,7 @@ not present in one matrix but it is present in at least one of the others.
 }
 \examples{
 
-# Create list of imput matrices
+# Create list of input matrices
 set.seed(123);
 M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 rownames(M1) <- paste0("ID_", 1:nrow(M1));
@@ -43,7 +43,7 @@ M2[8, 1] <- NA;
 M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
 rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
 M3[4, 1] <- NA;
-M3[7, 1:8] <- rep(NA, 8);
+M3[7, ] <- rep(NA, ncol(M3));
 
 Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 

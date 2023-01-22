@@ -6,9 +6,9 @@
 #' \loadmathjax
 #' \itemize{
 #' \item "reconstruct strategy" that can partially reconstruct missing
-#'   data by using information from different sources
+#'   data by using information from different sources (i.e. miss-SNF ONE).
 #' \item "ignore strategy" which simply ignores missing data during the integration
-#'   process
+#'   process (i.e. miss-SNF ZERO).
 #' }
 #'
 #' @param Mall list of named matrices/dataframes (samples x features).
@@ -17,18 +17,19 @@
 #'             "scaled.exp.euclidean" is the scaled exponential euclidean distance;
 #'             "scaled.exp.chi2" is the scaled exponential chi-square distance
 #' @param mode string. If you want to partially reconstruct missing data use
-#'             "reconstruct", otherwise ignore them during integration using
-#'             "ignore".
-#' @param perc.na percentage of NAs above which patient is considered missing.
+#'             "reconstruct" or "one", otherwise ignore them during integration
+#'             using "ignore" or "zero".
+#' @param perc.na percentage of NAs above which a patient is considered missing.
 #' @param miss.symbols vector of strings. If not NULL, the provided symbols
 #'                     in matrices are converted to NA.
 #' @param K Number of neighbors in K-nearest neighbors part of the algorithm.
 #' @param t Number of iterations for the diffusion process.
 #' @param impute string. Kind of imputation method to apply in case of samples
 #'               with few missing values. Options are: NULL, "mean", "median".
-#'               NOTE: if impute=NULL, then perc.na has to be 0.
+#'               NOTE: if impute=NULL, then perc.na has to be 0 (i.e.
+#'               having even one NA will make the patient treated as missing).
 #' @param d numeric. Set the diagonal of the matrix to "d" if
-#' mode="reconstruct" (def d=1).
+#' mode="reconstruct" or mode="one" (def d=1).
 #' @param random.walk string. Use 1-step Random Walk to compute the local
 #' similarity matrix S and/or p-step Random Walk to compute the global
 #' similarity matrix P. random.walk=c("global", "local", "both", "none") and
@@ -41,7 +42,8 @@
 #' \item W : integrated similarity matrix. Note that the order of the patients
 #' is different from the order of the original matrices.
 #' \item removed.pts : vector with names of removed patients (i.e. patients
-#' present only in one matrix of Mall and having too much NAs).
+#' present only in one matrix of Mall and having too much NAs or, more in general,
+#' if a patient is considered missing in all data sources).
 #' }
 #' @export
 #'
@@ -63,7 +65,7 @@
 #' M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
 #' rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
 #' M3[4, 1] <- NA;
-#' M3[7, 1:8] <- rep(NA, 8);
+#' M3[7, ] <- rep(NA, ncol(M3));
 #'
 #' Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 #'
@@ -414,7 +416,7 @@ scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 #'
 #' @examples
 #'
-#' # Create list of imput matrices
+#' # Create list of input matrices
 #' set.seed(123);
 #' M1 <- matrix(runif(50, min = 0, max = 1), nrow = 5); # 5 samples
 #' rownames(M1) <- paste0("ID_", 1:nrow(M1));
@@ -430,7 +432,7 @@ scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 #' M3 <- matrix(runif(80, min = 0, max = 1), nrow = 8); # 8 samples
 #' rownames(M3) <- c(paste0("ID_", 1:5), paste0("ID_", 11:13));
 #' M3[4, 1] <- NA;
-#' M3[7, 1:8] <- rep(NA, 8);
+#' M3[7, ] <- rep(NA, ncol(M3));
 #'
 #' Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 #'
