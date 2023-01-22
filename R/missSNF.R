@@ -203,7 +203,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             Wall[[i]] <- RANKS::p.step.rw.kernel(Wall[[i]], p=p)
             Wall[[i]] <- NetPreProc::Prob.norm(Wall[[i]]) # Normalization with unnormalized lagrangian
 
-        } else if(random.walk == "none"){
+        } else if(random.walk == "none" | random.walk == "local"){
 
             Wall[[i]] <- .normalize(Wall[[i]])
 
@@ -247,7 +247,7 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
             newW[[i]] <- RANKS::rw.kernel(Wall_aligned[[i]])
             newW[[i]] <- NetPreProc::Prob.norm(newW[[i]]) # Normalization with unnormalized lagrangian
 
-        } else if (random.walk == "none"){
+        } else if (random.walk == "none" | random.walk == "global"){
 
             newW[[i]] <- .local.similarity.matrix(Wall_aligned[[i]], K);
 
