@@ -53,7 +53,8 @@ similarity matrix S and/or p-step Random Walk to compute the global
 similarity matrix P. random.walk=c("global", "local", "both", "none") and
 defaults is random.walk="none".}
 
-\item{p}{numeric. Number of steps for the p-step RW.}
+\item{p}{numeric. Number of steps for the p-step RW. Used only when
+global similarity matrix is computed through p-step Random Walk.}
 
 \item{...}{additional arguments for similarity measures.}
 }
