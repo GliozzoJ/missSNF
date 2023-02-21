@@ -7,6 +7,7 @@
 miss.snf(
   Mall,
   sims,
+  sims.arg = vector("list", length(sims)),
   mode = "reconstruct",
   perc.na = 0.2,
   miss.symbols = NULL,
@@ -15,8 +16,7 @@ miss.snf(
   impute = "median",
   d = 1,
   random.walk = "none",
-  p = 3,
-  ...
+  p = 3
 )
 }
 \arguments{
@@ -26,6 +26,12 @@ miss.snf(
 similarity measures to apply to the matrices in Mall.
 "scaled.exp.euclidean" is the scaled exponential euclidean distance;
 "scaled.exp.chi2" is the scaled exponential chi-square distance}
+
+\item{sims.arg}{list. List with the same lenght of "sims" where each elements
+is a list containing additional arguments for each
+similarity measure in the argument "sims". Set element to
+NULL if you want to use default parameters for a specific
+similarity measure (default).}
 
 \item{mode}{string. If you want to partially reconstruct missing data use
 "reconstruct" or "one", otherwise ignore them during integration
@@ -55,8 +61,6 @@ defaults is random.walk="none".}
 
 \item{p}{numeric. Number of steps for the p-step RW. Used only when
 global similarity matrix is computed through p-step Random Walk.}
-
-\item{...}{additional arguments for similarity measures.}
 }
 \value{
 A list with two elements:
@@ -103,10 +107,12 @@ M3[7, ] <- rep(NA, ncol(M3));
 Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 
 # Call miss.snf using "reconstruct strategy"
-W.r <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="reconstruct",
-               K=3, kk=2);
+W.r <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3),
+               sims.arg=list(list(kk=2), list(kk=2), list(kk=2)),
+               mode="reconstruct", K=3);
 
 # Call miss.snf using "ignore strategy"
-W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="ignore",
-               K=3, kk=2);
+W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3),
+               sims.arg=list(list(kk=2), list(kk=2), list(kk=2)),
+               mode="ignore", K=3);
 }

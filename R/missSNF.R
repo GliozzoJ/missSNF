@@ -16,6 +16,11 @@
 #'             similarity measures to apply to the matrices in Mall.
 #'             "scaled.exp.euclidean" is the scaled exponential euclidean distance;
 #'             "scaled.exp.chi2" is the scaled exponential chi-square distance
+#' @param sims.arg list. List with the same lenght of "sims" where each elements
+#'                 is a list containing additional arguments for each
+#'                 similarity measure in the argument "sims". Set element to
+#'                 NULL if you want to use default parameters for a specific
+#'                 similarity measure (default).
 #' @param mode string. If you want to partially reconstruct missing data use
 #'             "reconstruct" or "one", otherwise ignore them during integration
 #'             using "ignore" or "zero".
@@ -36,7 +41,6 @@
 #' defaults is random.walk="none".
 #' @param p numeric. Number of steps for the p-step RW. Used only when
 #' global similarity matrix is computed through p-step Random Walk.
-#' @param ... additional arguments for similarity measures.
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -71,15 +75,18 @@
 #' Mall <- list("M1"=M1, "M2"=M2, "M3"=M3);
 #'
 #' # Call miss.snf using "reconstruct strategy"
-#' W.r <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="reconstruct",
-#'                K=3, kk=2);
+#' W.r <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3),
+#'                sims.arg=list(list(kk=2), list(kk=2), list(kk=2)),
+#'                mode="reconstruct", K=3);
 #'
 #' # Call miss.snf using "ignore strategy"
-#' W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3), mode="ignore",
-#'                K=3, kk=2);
-miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
+#' W.i <- miss.snf(Mall, sims=rep("scaled.exp.euclidean", 3),
+#'                sims.arg=list(list(kk=2), list(kk=2), list(kk=2)),
+#'                mode="ignore", K=3);
+miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
+                     mode="reconstruct", perc.na=0.2,
                      miss.symbols=NULL, K=20, t=20, impute="median",
-                     d=1, random.walk="none", p=3, ...) {
+                     d=1, random.walk="none", p=3) {
 
     # Allow naming of mode as "one" or "zero"
     # Possible values for mode: one/reconstruct or zero/ignore
@@ -144,9 +151,13 @@ miss.snf <- function(Mall, sims, mode="reconstruct", perc.na=0.2,
 
         # Handle presence of matrices without patients to remove for NAs
         if(length(idx.miss.pts) != 0){
-            Wall[[i]] <- sim.fun(Mall[[i]][-idx.miss.pts, ], ...);
+            dc <- Mall[[i]][-idx.miss.pts, ]
+            #Wall[[i]] <- sim.fun(Mall[[i]][-idx.miss.pts, ], ...);
+            Wall[[i]] <- do.call(sim.fun, c(list(dc), sims.arg[[i]]))
         } else{
-            Wall[[i]] <- sim.fun(Mall[[i]], ...);
+            dc <- Mall[[i]]
+            #Wall[[i]] <- sim.fun(Mall[[i]], ...);
+            Wall[[i]] <- do.call(sim.fun, c(list(dc), sims.arg[[i]]))
         }
     }
 
