@@ -9,6 +9,9 @@
 #'   data by using information from different sources (i.e. miss-SNF ONE).
 #' \item "ignore strategy" which simply ignores missing data during the integration
 #'   process (i.e. miss-SNF ZERO).
+#' \item "equidistant strategy", similar to reconstruct but sets the similarity
+#' of the partial samples with the others to a fixed value instead of zero.
+#' \item "random strategy" that sets the similatiry randomly.
 #' }
 #'
 #' @param Mall list of named matrices/dataframes (samples x features).
@@ -16,14 +19,19 @@
 #'             similarity measures to apply to the matrices in Mall.
 #'             "scaled.exp.euclidean" is the scaled exponential euclidean distance;
 #'             "scaled.exp.chi2" is the scaled exponential chi-square distance
-#' @param sims.arg list. List with the same lenght of "sims" where each elements
+#' @param sims.arg list. List with the same length of "sims" where each elements
 #'                 is a list containing additional arguments for each
 #'                 similarity measure in the argument "sims". Set element to
 #'                 NULL if you want to use default parameters for a specific
 #'                 similarity measure (default).
 #' @param mode string. If you want to partially reconstruct missing data use
-#'             "reconstruct" or "one", otherwise ignore them during integration
-#'             using "ignore" or "zero".
+#'             "reconstruct" or "one" (default), otherwise ignore them during integration
+#'             using "ignore" or "zero". If you use "equidistant", the self-loop
+#'             for partial samples is set to 0.5 while the similarity with other
+#'             samples is set to the same value so that the sample is equidistant
+#'             from all other samples but more similar to itself than others.
+#'             The option "random" sets randomly the similarity of partial
+#'             samples (let's consider this as a baseline).
 #' @param perc.na percentage of NAs above which a patient is considered missing.
 #' @param miss.symbols vector of strings. If not NULL, the provided symbols
 #'                     in matrices are converted to NA.
@@ -36,11 +44,13 @@
 #' @param d numeric. Set the diagonal of the matrix to "d" if
 #' mode="reconstruct" or mode="one" (def d=1).
 #' @param random.walk string. Use 1-step Random Walk to compute the local
-#' similarity matrix S and/or p-step Random Walk to compute the global
+#' similarity matrix S and/or p-step Random Walk (p>=2) to compute the global
 #' similarity matrix P. random.walk=c("global", "local", "both", "none") and
 #' defaults is random.walk="none".
 #' @param p numeric. Number of steps for the p-step RW. Used only when
 #' global similarity matrix is computed through p-step Random Walk.
+#' @param seed numeric. Seed to get reproducible results. Needed only if
+#' mode = "random".
 #'
 #' @return A list with two elements:
 #' \itemize{
@@ -51,6 +61,7 @@
 #' if a patient is considered missing in all data sources).
 #' }
 #' @export
+#' @importFrom stats runif
 #'
 #' @examples
 #'
@@ -86,7 +97,7 @@
 miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
                      mode="reconstruct", perc.na=0.2,
                      miss.symbols=NULL, K=20, t=20, impute="median",
-                     d=1, random.walk="none", p=3) {
+                     d=1, random.walk="none", p=3, seed=NULL) {
 
     # Allow naming of mode as "one" or "zero"
     # Possible values for mode: one/reconstruct or zero/ignore
@@ -98,9 +109,9 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
         mode <- "ignore"
     }
 
-    if(!(mode == "reconstruct" | mode == "ignore")){
+    if(!(mode == "reconstruct" | mode == "ignore" | mode == "random" | mode == "equidistant")){
 
-        stop("miss.snf: mode can be only one/reconstruct or zero/ignore.")
+        stop("miss.snf: mode can be only one/reconstruct, zero/ignore, equidistant or random.")
     }
 
     # Check that a similarity measures is provided for each matrix
@@ -163,7 +174,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
 
     # NOTE: Here Wall represent a list of the similarity function (either the scaled
     # exponential similarity kernel or the chi square similarity kernel depending
-    # on the arguments of the parameter sims
+    # on the arguments of the parameter sims). Matrices are not of the same size.
 
 
     # Align networks replacing missing patients with 0
@@ -175,15 +186,42 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     removed.pts <- rownames(removed.pts.tab)[removed.pts.tab];
 
     # Set diagonal of missing elements to "d" if "reconstruct" mode is used
-    # If "ignore" mode, missing patients are already set to vector of zeros
+    # If "ignore" mode, missing patients are already set to vector of zeros.
+    # If mode is "equidistant", the diagonal is set to 0.5 and the other elements
+    # to 0.5/(|W|-1) for partial samples. If mode is "random", similarity for
+    # partial samples is set to random values from uniform distribution.
     idx.miss.aligned <- list();
+    if(mode == "random"){set.seed(seed)} #set seed for reproducibility if random
+
     for(i in 1:length(Wall_aligned)){
+
         idx <- which(!(rownames(Wall_aligned[[i]]) %in% rownames(Wall[[i]])));
         idx.miss.aligned[[i]] <- idx;
         if(mode == "reconstruct"){
 
             diag(Wall_aligned[[i]])[idx] <- d;
 
+        } else if(mode == "equidistant"){
+
+            eq <- 0.5/(ncol(Wall_aligned[[i]]) - 1)
+            Wall_aligned[[i]][idx, ] <- eq
+            Wall_aligned[[i]][, idx] <- eq
+
+            diag(Wall_aligned[[i]])[idx] <- 0.5
+
+        } else if(mode == "random"){
+
+            # Create matrix of 0s with same dimensions of Wall_aligned[[i]]
+            ran <- matrix(0, nrow=nrow(Wall_aligned[[i]]), ncol=ncol(Wall_aligned[[i]]))
+            # Set columns for partial samples to random values from uniform
+            # distribution (min and max of the distribution are taken from the
+            # matrix). A little epsilon (.Machine$double.eps) is added to avoid
+            # zeros among random elements.
+            ran[, idx] <- runif(nrow(Wall_aligned[[i]])*length(idx),
+                                min = min(Wall_aligned[[i]]),
+                                max = max(Wall_aligned[[i]])) + .Machine$double.eps
+            ran <- (ran+t(ran))/2 #make symmetric
+            Wall_aligned[[i]][ran != 0] <- ran[ran != 0]
         }
     }
 
@@ -193,7 +231,8 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     # (in reconstruct mode) have values Wall_aligned[][i,i] = 1
     Wall <- Wall_aligned;
 
-    # FROM NOW ON STARTS SNF CODE
+    # FROM NOW ON STARTS SNF CODE (as implemented in SNFtool + changes
+    # introduced on matrices P and S for missSNF)
     ############################################################################
     ############################################################################
 
@@ -228,11 +267,34 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
 
         ### [J]: set diagonal to d if mode="reconstruct", 0 otherwise for missing
         ### patients. The other elements for missing patients should remain zero
-        ### even after normalization or p-step Random Walk.
+        ### even after normalization or p-step Random Walk. "equidistant" and
+        ### "random" modes are implemented as before.
 
-        if(mode == "reconstruct"){
+        if(mode == "equidistant"){
+
+            idx <- idx.miss.aligned[[i]]
+
+            eq <- 0.5/(ncol(Wall[[i]]) - 1)
+            Wall[[i]][idx, ] <- eq
+            Wall[[i]][, idx] <- eq
+
+            diag(Wall[[i]])[idx] <- 0.5
+
+        } else if(mode == "random"){
+
+            idx <- idx.miss.aligned[[i]]
+            ran <- matrix(0, nrow=nrow(Wall[[i]]), ncol=ncol(Wall[[i]]))
+            ran[, idx] <- runif(nrow(Wall[[i]])*length(idx),
+                                min = min(Wall[[i]]),
+                                max = max(Wall[[i]])) + .Machine$double.eps
+            ran <- (ran+t(ran))/2
+            Wall[[i]][ran != 0] <- ran[ran != 0]
+
+
+        } else if(mode == "reconstruct"){
 
             diag(Wall[[i]])[idx.miss.aligned[[i]]] <- d;
+
         } else {
 
             diag(Wall[[i]])[idx.miss.aligned[[i]]] <- 0;
@@ -269,9 +331,31 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
         }
 
         # Set diagonal to d for mode reconstruct and 0 for mode ignore.
-        if(mode == "reconstruct"){
+        # "equidistant" and "random" modes are computed as before.
+        if(mode == "equidistant"){
+
+            idx <- idx.miss.aligned[[i]]
+
+            eq <- 0.5/(ncol(newW[[i]]) - 1)
+            newW[[i]][idx, ] <- eq
+            newW[[i]][, idx] <- eq
+
+            diag(newW[[i]])[idx] <- 0.5
+
+        } else if(mode == "random"){
+
+            idx <- idx.miss.aligned[[i]]
+            ran <- matrix(0, nrow=nrow(newW[[i]]), ncol=ncol(newW[[i]]))
+            ran[, idx] <- runif(nrow(newW[[i]])*length(idx),
+                                min = min(newW[[i]]),
+                                max = max(newW[[i]])) + .Machine$double.eps
+            ran <- (ran+t(ran))/2
+            newW[[i]][ran != 0] <- ran[ran != 0]
+
+        } else if(mode == "reconstruct"){
 
             diag(newW[[i]])[idx.miss.aligned[[i]]] <- d;
+
         } else {
 
             diag(newW[[i]])[idx.miss.aligned[[i]]] <- 0;
@@ -306,7 +390,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
 
     ### [J]: if we use miss-SNF ignore, division considers only the
     ### actual number of available data sources
-    if(mode == "reconstruct"){
+    if(mode != "ignore"){
         W <- W/LW
     } else{
         M <- simplify2array(Wall)

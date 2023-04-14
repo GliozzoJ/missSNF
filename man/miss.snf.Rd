@@ -16,7 +16,8 @@ miss.snf(
   impute = "median",
   d = 1,
   random.walk = "none",
-  p = 3
+  p = 3,
+  seed = NULL
 )
 }
 \arguments{
@@ -27,15 +28,20 @@ similarity measures to apply to the matrices in Mall.
 "scaled.exp.euclidean" is the scaled exponential euclidean distance;
 "scaled.exp.chi2" is the scaled exponential chi-square distance}
 
-\item{sims.arg}{list. List with the same lenght of "sims" where each elements
+\item{sims.arg}{list. List with the same length of "sims" where each elements
 is a list containing additional arguments for each
 similarity measure in the argument "sims". Set element to
 NULL if you want to use default parameters for a specific
 similarity measure (default).}
 
 \item{mode}{string. If you want to partially reconstruct missing data use
-"reconstruct" or "one", otherwise ignore them during integration
-using "ignore" or "zero".}
+"reconstruct" or "one" (default), otherwise ignore them during integration
+using "ignore" or "zero". If you use "equidistant", the self-loop
+for partial samples is set to 0.5 while the similarity with other
+samples is set to the same value so that the sample is equidistant
+from all other samples but more similar to itself than others.
+The option "random" sets randomly the similarity of partial
+samples (let's consider this as a baseline).}
 
 \item{perc.na}{percentage of NAs above which a patient is considered missing.}
 
@@ -55,12 +61,15 @@ having even one NA will make the patient treated as missing).}
 mode="reconstruct" or mode="one" (def d=1).}
 
 \item{random.walk}{string. Use 1-step Random Walk to compute the local
-similarity matrix S and/or p-step Random Walk to compute the global
+similarity matrix S and/or p-step Random Walk (p>=2) to compute the global
 similarity matrix P. random.walk=c("global", "local", "both", "none") and
 defaults is random.walk="none".}
 
 \item{p}{numeric. Number of steps for the p-step RW. Used only when
 global similarity matrix is computed through p-step Random Walk.}
+
+\item{seed}{numeric. Seed to get reproducible results. Needed only if
+mode = "random".}
 }
 \value{
 A list with two elements:
@@ -82,6 +91,9 @@ nearly complete) of a specific data source for a given patient by:
   data by using information from different sources (i.e. miss-SNF ONE).
 \item "ignore strategy" which simply ignores missing data during the integration
   process (i.e. miss-SNF ZERO).
+\item "equidistant strategy", similar to reconstruct but sets the similarity
+of the partial samples with the others to a fixed value instead of zero.
+\item "random strategy" that sets the similatiry randomly.
 }
 }
 \examples{
