@@ -1,5 +1,6 @@
 #' Startup message
 #'
+#' @keywords internal
 #' @noRd
 #'
 #' @importFrom utils packageVersion
