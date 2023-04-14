@@ -1,12 +1,17 @@
+#' Startup message
+#'
+#' @noRd
+#'
+#' @importFrom utils packageVersion
 missSNFStartupMessage <- function()
 {
-    # Startup message obtained as 
+    # Startup message obtained as
     # > figlet -f digital "miss-SNF"
     msg <- c(paste0(
-        "  
+        "
 +-+-+-+-+-+-+-+-+
 |m|i|s|s|-|S|N|F|
-+-+-+-+-+-+-+-+-+ \t version ", packageVersion("missSNF"), 
++-+-+-+-+-+-+-+-+ \t version ", packageVersion("missSNF"),
         "\n\nSimilarity Network Fusion (SNF) algorithm with missing data"))
     return(msg)
 }
@@ -15,7 +20,7 @@ missSNFStartupMessage <- function()
 {
     msg <- missSNFStartupMessage()
     if(!interactive())
-        msg[1] <- paste("Package 'missSNF' version", packageVersion("missSNF"))
-    packageStartupMessage(msg)      
+        msg[1] <- paste("Package 'missSNF' version", utils::packageVersion("missSNF"))
+    packageStartupMessage(msg)
     invisible()
 }
