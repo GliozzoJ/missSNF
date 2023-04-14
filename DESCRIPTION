@@ -2,7 +2,7 @@ Package: missSNF
 Type: Package
 Title: Similarity Network Fusion (SNF) algorithm with missing data
 Version: 1.0.0
-Author@R: c(
+Authors@R: c(
     person("Jessica", "Gliozzo", email = "jessica.gliozzo@unimi.it", role = c("aut", "cre")), 
     person("Giorgio", "Valentini", email = "valentini@di.unimi.it", role = "aut"),
     person("Elena", "Casiraghi", email = "elena.casiraghi@unimi.it", role = "aut"))
@@ -19,6 +19,6 @@ Description: Implementation of miss-SNF, a modification of the algorithm Similar
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
-Imports: SNFtool, NetInt, mathjaxr
-RoxygenNote: 7.2.0
+Imports: SNFtool, NetInt, RANKS, NetPreProc, mathjaxr
+RoxygenNote: 7.2.3
 RdMacros: mathjaxr
