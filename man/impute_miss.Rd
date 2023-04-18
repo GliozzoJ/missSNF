@@ -4,7 +4,7 @@
 \alias{impute_miss}
 \title{Impute patients with few NAs}
 \usage{
-impute_miss(data, perc.na, method)
+impute_miss(data, perc.na, method, verbose = TRUE)
 }
 \arguments{
 \item{data}{matrix. Matrix (samples x features).}
@@ -12,6 +12,8 @@ impute_miss(data, perc.na, method)
 \item{perc.na}{numeric. Percentage of missing features.}
 
 \item{method}{string. An imputation method (possible options mean, median).}
+
+\item{verbose}{boolean. Want to print messages? (def. TRUE)}
 }
 \value{
 Imputed data matrix.

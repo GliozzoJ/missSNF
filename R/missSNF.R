@@ -147,7 +147,8 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
         }
     }else if(impute == "median" | impute == "mean"){
         for(i in 1:length(Mall)){
-            Mall[[i]] <- impute_miss(Mall[[i]], perc.na=perc.na, method=impute)
+            Mall[[i]] <- impute_miss(Mall[[i]], perc.na=perc.na, method=impute,
+                                     verbose=FALSE)
         }
     } else {
         stop("miss.snf: imputation method can be only median or mean.")
@@ -593,10 +594,11 @@ get.miss.pts <- function(Mall, perc.na=0.2, miss.symbols=NULL){
 #' @param data matrix. Matrix (samples x features).
 #' @param perc.na numeric. Percentage of missing features.
 #' @param method string. An imputation method (possible options mean, median).
+#' @param verbose boolean. Want to print messages? (def. TRUE)
 #'
 #' @return Imputed data matrix.
 #' @export
-impute_miss <- function(data, perc.na, method) {
+impute_miss <- function(data, perc.na, method, verbose=TRUE) {
 
     # Retrieve imputation method
     impute_func <- get(method)
@@ -605,7 +607,7 @@ impute_miss <- function(data, perc.na, method) {
     n_na <- apply(is.na(data), 1, sum)
     idx_impute <- which(n_na/ncol(data) <= perc.na & n_na/ncol(data) != 0)
 
-    if(length(idx_impute) == 0){
+    if(length(idx_impute) == 0 & verbose == TRUE){
         message("impute_miss: no samples to impute are present.")
     }
 
