@@ -59,6 +59,8 @@
 #' \item removed.pts : vector with names of removed patients (i.e. patients
 #' present only in one matrix of Mall and having too much NAs or, more in general,
 #' if a patient is considered missing in all data sources).
+#' \item conv : vector with the Frobenius norm between the standard deviation across
+#' global matrices after cross-diffusion, considering consecutive steps.
 #' }
 #' @export
 #' @importFrom stats runif
@@ -365,6 +367,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     }
 
     #Perform the diffusion for t iterations
+    conv <- rep(NA, t-1)
     for (i in 1:t) {
         for(j in 1:LW){
             sumWJ <- matrix(0,dim(Wall[[j]])[1], dim(Wall[[j]])[2])
@@ -381,6 +384,16 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
             Wall[[j]] <- .normalize(nextW[[j]])
             Wall[[j]] <- (Wall[[j]] + t(Wall[[j]]))/2;
         }
+
+        # Keep track of convergence
+        Wall_sd <- apply(simplify2array(Wall), 1:2, stats::sd)
+        if(i != 1){
+            conv[i-1] <- norm((Wall_sd - Wall_sd_prev), type = "F")
+
+        }
+
+         Wall_sd_prev <- Wall_sd
+
     }
 
     # Construct the combined affinity matrix by summing diffused matrices
@@ -410,7 +423,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     # Assign names to matrix
     dimnames(W) <- wall.names
 
-    return(list(W=W, removed.pts=removed.pts))
+    return(list(W=W, removed.pts=removed.pts, conv=conv))
 }
 
 
