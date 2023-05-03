@@ -79,8 +79,10 @@ is different from the order of the original matrices.
 \item removed.pts : vector with names of removed patients (i.e. patients
 present only in one matrix of Mall and having too much NAs or, more in general,
 if a patient is considered missing in all data sources).
-\item conv : vector with the Frobenius norm between the standard deviation across
+\item conv1 : vector with the Frobenius norm between the standard deviation across
 global matrices after cross-diffusion, considering consecutive steps.
+\item conv2 : vector containing the Frobenius norm of the difference among the
+integrated matrices at two consecutive steps.
 }
 }
 \description{

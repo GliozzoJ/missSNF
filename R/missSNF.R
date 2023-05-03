@@ -59,8 +59,10 @@
 #' \item removed.pts : vector with names of removed patients (i.e. patients
 #' present only in one matrix of Mall and having too much NAs or, more in general,
 #' if a patient is considered missing in all data sources).
-#' \item conv : vector with the Frobenius norm between the standard deviation across
+#' \item conv1 : vector with the Frobenius norm between the standard deviation across
 #' global matrices after cross-diffusion, considering consecutive steps.
+#' \item conv2 : vector containing the Frobenius norm of the difference among the
+#' integrated matrices at two consecutive steps.
 #' }
 #' @export
 #' @importFrom stats runif
@@ -367,7 +369,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     }
 
     #Perform the diffusion for t iterations
-    conv <- rep(NA, t-1)
+    conv1 <- conv2 <- rep(NA, t-1)
     for (i in 1:t) {
         for(j in 1:LW){
             sumWJ <- matrix(0,dim(Wall[[j]])[1], dim(Wall[[j]])[2])
@@ -386,9 +388,28 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
         }
 
         # Keep track of convergence
+        ## Compute convergence method 2 (conv 2)
+        Wint <- Reduce('+', Wall)
+        if(mode != "ignore"){
+            Wint <- Wint/LW
+        } else{
+            M <- simplify2array(Wall)
+            M[M > 0] <- 1
+            M <- rowSums(M, dims = 2)
+            Wint <- Wint * (1/M)
+            Wint[is.nan(Wint)] <- 0
+        }
+
+        if(i != 1){
+            conv2[i-1] <- norm((Wint - Wint_prev), type = "F")
+        }
+
+        Wint_prev <- Wint
+
+        ## Compute convergence method 1 (conv 1)
         Wall_sd <- apply(simplify2array(Wall), 1:2, stats::sd)
         if(i != 1){
-            conv[i-1] <- norm((Wall_sd - Wall_sd_prev), type = "F")
+            conv1[i-1] <- norm((Wall_sd - Wall_sd_prev), type = "F")
 
         }
 
@@ -423,7 +444,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     # Assign names to matrix
     dimnames(W) <- wall.names
 
-    return(list(W=W, removed.pts=removed.pts, conv=conv))
+    return(list(W=W, removed.pts=removed.pts, conv1=conv1, conv2=conv2))
 }
 
 
