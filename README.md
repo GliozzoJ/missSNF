@@ -19,9 +19,13 @@ install.packages("devtools");
 library("devtools");
 ```
 
-3. Then, you can install miss-SNF:
+3. Then, you can install miss-SNF (some Bioconductor packages
+has to be installed apart):
 
 ```
+BiocManager::install("RBGL")
+BiocManager::install("graph")
+BiocManager::install("limma")
 install("./missSNF");
 ```
 
