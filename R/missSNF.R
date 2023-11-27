@@ -369,7 +369,8 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     }
 
     #Perform the diffusion for t iterations
-    conv1 <- conv2 <- rep(NA, t-1)
+    conv1 <- conv2 <- conv3 <- rep(NA, t-1)
+    WINT <- list()
     for (i in 1:t) {
         for(j in 1:LW){
             sumWJ <- matrix(0,dim(Wall[[j]])[1], dim(Wall[[j]])[2])
@@ -415,6 +416,11 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
 
          Wall_sd_prev <- Wall_sd
 
+        ## Store integrated matrices for convergence method 3 (conv 3)
+        if(i != 1){
+            WINT[[i-1]] <- Wint
+        }
+        
     }
 
     # Construct the combined affinity matrix by summing diffused matrices
@@ -444,7 +450,12 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
     # Assign names to matrix
     dimnames(W) <- wall.names
 
-    return(list(W=W, removed.pts=removed.pts, conv1=conv1, conv2=conv2))
+    ##  convergence method 3 (conv 3)
+    for (i in 1:(t-1)) {
+        conv3[i] <- norm((WINT[[t-1]] - WINT[[i]]), type = "F")
+    }
+
+    return(list(W=W, removed.pts=removed.pts, conv1=conv1, conv2=conv2, conv3=conv3))
 }
 
 
