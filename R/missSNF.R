@@ -63,6 +63,9 @@
 #' global matrices after cross-diffusion, considering consecutive steps.
 #' \item conv2 : vector containing the Frobenius norm of the difference among the
 #' integrated matrices at two consecutive steps.
+#'  \item conv3 : vector containing the Frobenius norm of the difference among the
+#' integrated matrix at each iteration and the final integrated matrix (measures
+#' convergence velocity).
 #' }
 #' @export
 #' @importFrom stats runif
@@ -420,7 +423,7 @@ miss.snf <- function(Mall, sims, sims.arg=vector("list", length(sims)),
         if(i != 1){
             WINT[[i-1]] <- Wint
         }
-        
+
     }
 
     # Construct the combined affinity matrix by summing diffused matrices
