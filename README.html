@@ -421,8 +421,14 @@ display: none;
 <p>The “miss-SNF” package can be installed using devtools. Please follow
 these steps:</p>
 <ol start="0" style="list-style-type: decimal">
-<li><p>Download miss-SNF package from this repository.</p></li>
-<li><p>Install devtools using:</p></li>
+<li>Download or clone miss-SNF package from this repository.</li>
+</ol>
+<pre><code># Code to clone repository
+git clone https://github.com/AnacletoLAB/missSNF.git</code></pre>
+<p>You can download the .zip file containing this repository using the
+“&lt; &gt; Code” button.</p>
+<ol style="list-style-type: decimal">
+<li>Install devtools using:</li>
 </ol>
 <pre><code>install.packages(&quot;devtools&quot;);</code></pre>
 <ol start="2" style="list-style-type: decimal">
@@ -433,9 +439,16 @@ these steps:</p>
 <li>Then, you can install miss-SNF (some Bioconductor packages has to be
 installed apart):</li>
 </ol>
-<pre><code>BiocManager::install(&quot;RBGL&quot;)
+<pre><code># Install BiocManager
+if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+# Install Bioconductor dependencies
+BiocManager::install(&quot;RBGL&quot;)
 BiocManager::install(&quot;graph&quot;)
 BiocManager::install(&quot;limma&quot;)
+
+# Install miss-SNF
 install(&quot;./missSNF&quot;);</code></pre>
 <ol start="4" style="list-style-type: decimal">
 <li>Now miss-SNF can be used as every R package:</li>

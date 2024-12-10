@@ -8,7 +8,14 @@
 The "miss-SNF" package can be installed using devtools. Please
 follow these steps:
 
-0. Download miss-SNF package from this repository.
+0. Download or clone miss-SNF package from this repository.
+
+```
+# Code to clone repository
+git clone https://github.com/AnacletoLAB/missSNF.git
+```
+
+You can download the .zip file containing this repository using the "< > Code" button.
 
 1. Install devtools using:
 
@@ -26,9 +33,16 @@ library("devtools");
 has to be installed apart):
 
 ```
+# Install BiocManager
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+# Install Bioconductor dependencies
 BiocManager::install("RBGL")
 BiocManager::install("graph")
 BiocManager::install("limma")
+
+# Install miss-SNF
 install("./missSNF");
 ```
 
