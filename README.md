@@ -1,4 +1,4 @@
-![miss-SNF logo](./man/figures/miss-SNF_logo.svg)
+<img src="./man/figures/miss-SNF_logo.svg" alt="miss-SNF logo" width="250"/>
 
 ## Installation
 
