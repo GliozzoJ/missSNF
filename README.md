@@ -1,4 +1,4 @@
-<img src="./man/figures/miss-SNF_logo.svg" alt="miss-SNF logo" width="275"/>
+<center><img src="./man/figures/miss-SNF_logo.svg" alt="miss-SNF logo" width="275"/></center>
 
 ## Installation
 
