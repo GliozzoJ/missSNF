@@ -352,6 +352,32 @@ display: none;
 </div>
 
 
+<div id="miss-snf-a-novel-multimodal-integration-approach-handling-completely-missing-data-sources" class="section level1">
+<h1>miss-SNF: a novel multimodal integration approach handling
+completely missing data sources</h1>
+<p>Precision medicine leverages patient-specific data to improve
+prevention, diagnosis, prognosis and treatment of diseases. Advancing
+precision medicine requires the non-trivial integration of complex,
+heterogeneous and potentially high-dimensional data sources, such as
+multi-omics and clinical data. However, these datasets are frequently
+incomplete, with one or more sources missing for subsets of patients.
+Although data fusion approaches handling entirely missing sources showed
+their promise, their applicability remains limited, as they are
+typically designed and/or evaluated solely for clustering or
+classification tasks.</p>
+<p>We propose miss-SNF, a novel general-purpose data integration
+approach designed to fuse incomplete datasets while partially
+reconstructing missing pairwise similarities. miss-SNF integrates
+incomplete unimodal patient similarity networks by leveraging the
+non-linear message-passing strategy of Similarity Network Fusion. The
+resulting integrated network can be utilized for both clustering and
+classification tasks. We evaluated miss-SNF on nine cancer datasets from
+The Cancer Genome Atlas and compared it to representative state-of-the
+art integration approaches. It showed superior performance in recovering
+similarities and achieved competitive clustering results, identifying
+patients subgroups enriched in clinically relevant variables and showing
+differential survival. Moreover, we effectively used the fused network
+to predict clinical outcomes of medical interest.</p>
 <div align="center">
 <p><svg id="svg_be0af1e8aec5f191bada" role="img" aria-label="miss-SNF logo" alt="miss-SNF logo" width="275" height="824pt" viewBox="0 0 975 824">
 <defs>
@@ -458,6 +484,39 @@ library(missSNF);
 
 # View documentation
 ?miss.snf()</code></pre>
+</div>
+<div id="additional-options" class="section level2">
+<h2>Additional options</h2>
+<p>miss-SNF implementation can impute missing values using simple
+strategies (i.e. mean or median imputation). Moreover, you can leverage
+the p-step Random Walk Kernel<a href="#fn1" class="footnote-ref" id="fnref1"><sup>1</sup></a><a href="#fn2" class="footnote-ref" id="fnref2"><sup>2</sup></a> to compute the “global” similarity matrix
+<span class="math inline">\(P\)</span> and/or 1-step Random Walk Kernel
+to compute the “local” similarity matrix <span class="math inline">\(S\)</span> of the algorithm.</p>
+<p>These options were not tested in the experiments presented in the
+submitted paper <a href="#fn3" class="footnote-ref" id="fnref3"><sup>3</sup></a>.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+</div>
+</div>
+<div class="footnotes footnotes-end-of-document">
+<hr />
+<ol>
+<li id="fn1"><p>Smola, Alexander J., and Risi Kondor. “Kernels and
+regularization on graphs.” Learning Theory and Kernel Machines: 16th
+Annual Conference on Learning Theory and 7th Kernel Workshop,
+COLT/Kernel 2003, Washington, DC, USA, August 24-27, 2003. Proceedings.
+Berlin, Heidelberg: Springer Berlin Heidelberg, 2003.<a href="#fnref1" class="footnote-back">↩︎</a></p></li>
+<li id="fn2"><p>Re, Matteo, Marco Mesiti, and Giorgio Valentini. “A fast
+ranking algorithm for predicting gene functions in biomolecular
+networks.” IEEE/ACM Transactions on Computational Biology and
+Bioinformatics 9.6 (2012): 1812-1818.<a href="#fnref2" class="footnote-back">↩︎</a></p></li>
+<li id="fn3"><p>Jessica Gliozzo, Mauricio A. Soto Gomez, Arturo
+Bonometti, Alex Patak, Alberto Paccanaro, Elena Casiraghi and Giorgio
+Valentini. “miss-SNF: a novel multimodal integration approach handling
+completely missing data sources” Bioinformatics
+<strong>[Submitted]</strong><a href="#fnref3" class="footnote-back">↩︎</a></p></li>
+</ol>
 </div>
 
 
