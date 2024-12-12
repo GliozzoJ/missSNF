@@ -21,7 +21,7 @@ follow these steps:
 git clone https://github.com/AnacletoLAB/missSNF.git
 ```
 
-You can download the .zip file containing this repository using the "< > Code" button.
+You can download the compressed _.zip_ file containing this repository using the "< > Code" button (decompress the folder before installation).
 
 1. Install devtools using:
 
