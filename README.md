@@ -1,4 +1,4 @@
-# miss-SNF: a novel multimodal integration approach handling completely missing data sources
+# A multimodal patient similarity network integration approach to handle completely missing data sources
 
 Precision medicine leverages patient-specific data to improve prevention, diagnosis, prognosis and treatment of diseases. Advancing precision medicine requires the non-trivial integration of complex, heterogeneous and potentially high-dimensional data sources, such as multi-omics and clinical data. However, these datasets are frequently incomplete, with one or more sources missing for subsets of patients. Although data fusion approaches handling entirely missing sources showed their promise, their applicability remains limited, as they are typically designed and/or evaluated solely for clustering or classification tasks.
 
@@ -69,7 +69,7 @@ miss-SNF implementation can impute missing values using simple strategies (i.e. 
 These options were not tested in the experiments presented in the submitted paper [^1].
 
 ## References
-[^1]: Jessica Gliozzo, Mauricio A. Soto Gomez, Arturo Bonometti, Alex Patak, Alberto Paccanaro, Elena Casiraghi and Giorgio Valentini. "miss-SNF: a novel multimodal integration approach handling completely missing data sources" Bioinformatics **[Submitted]**
+[^1]: Jessica Gliozzo, Mauricio A. Soto Gomez, Arturo Bonometti, Alex Patak, Elena Casiraghi and Giorgio Valentini. "A multimodal patient similarity network integration approach to handle completely missing data sources" npj Digital Medicine **[Submitted]**
 
 [^2]: Smola, Alexander J., and Risi Kondor. "Kernels and regularization on graphs." Learning Theory and Kernel Machines: 16th Annual Conference on Learning Theory and 7th Kernel Workshop, COLT/Kernel 2003, Washington, DC, USA, August 24-27, 2003. Proceedings. Berlin, Heidelberg: Springer Berlin Heidelberg, 2003.
 
