@@ -1,9 +1,12 @@
-# A multimodal patient similarity network integration approach to handle completely missing data sources
+# miss-SNF: a multimodal patient similarity network integration approach to handle completely missing data sources
 
-Precision medicine leverages patient-specific data to improve prevention, diagnosis, prognosis and treatment of diseases. Advancing precision medicine requires the non-trivial integration of complex, heterogeneous and potentially high-dimensional data sources, such as multi-omics and clinical data. However, these datasets are frequently incomplete, with one or more sources missing for subsets of patients. Although data fusion approaches handling entirely missing sources showed their promise, their applicability remains limited, as they are typically designed and/or evaluated solely for clustering or classification tasks.
+Precision medicine leverages patient-specific data to improve prevention, diagnosis, prognosis and treatment of diseases. Advancing precision medicine requires the non-trivial integration of complex, heterogeneous and potentially high-dimensional data sources, such as multi-omics and clinical data. 
+In literature several  approaches have been proposed to manage missing data, but usually limited to the recovery of subsets of features for a subset of patients. A largely overlooked problem is the integration of multiple sources of data when one or more of them are completely missing for a subset of patients, a relatively common condition  in clinical practice.
 
-We propose miss-SNF, a novel general-purpose data integration approach designed to fuse incomplete datasets while partially reconstructing missing pairwise similarities. 
-miss-SNF integrates incomplete unimodal patient similarity networks by leveraging the non-linear message-passing strategy of Similarity Network Fusion. The resulting integrated network can be utilized for both clustering and classification tasks. We evaluated miss-SNF on nine cancer datasets from The Cancer Genome Atlas and compared it to representative state-of-the art integration approaches. It showed superior performance in recovering similarities and achieved competitive clustering results, identifying patients subgroups enriched in clinically relevant variables and showing differential survival. Moreover, we effectively used the fused network to predict clinical outcomes of medical interest.
+We propose miss-Similarity Network Fusion (miss-SNF), a novel general-purpose data integration approach designed to manage completely missing data in the context of patient similarity networks.
+Miss-SNF integrates incomplete unimodal patient similarity networks by leveraging a non-linear message-passing strategy borrowed from the SNF algorithm.  
+Miss-SNF is able to recover patient similarity even with completely missing data sources and it is ``task agnostic'', in the sense that can integrate partial data for both unsupervised and supervised prediction tasks.
+We evaluated miss-SNF on nine cancer datasets from The Cancer Genome Atlas (TCGA) and compared it to representative state-of-the-art integration approaches. Miss-SNF showed superior performance in recovering similarities and achieved competitive clustering results, identifying patients subgroups enriched in clinically relevant variables and showing differential survival. Moreover, we successfully applied the integrated network with completely missing data, for the supervised prediction of the overall survival and progression free interval events.
 
 <div align="center">
 <img src="./man/figures/miss-SNF_logo.svg" alt="miss-SNF logo" width="275"/>
@@ -69,7 +72,7 @@ miss-SNF implementation can impute missing values using simple strategies (i.e. 
 These options were not tested in the experiments presented in the submitted paper [^1].
 
 ## References
-[^1]: Jessica Gliozzo, Mauricio A. Soto Gomez, Arturo Bonometti, Alex Patak, Elena Casiraghi and Giorgio Valentini. "A multimodal patient similarity network integration approach to handle completely missing data sources" npj Digital Medicine **[Submitted]**
+[^1]: Jessica Gliozzo, Mauricio A. Soto Gomez, Arturo Bonometti, Alex Patak, Elena Casiraghi and Giorgio Valentini. "miss-SNF: a multimodal patient similarity network integration approach to handle completely missing data sources." Bioinformatics **[Submitted]**
 
 [^2]: Smola, Alexander J., and Risi Kondor. "Kernels and regularization on graphs." Learning Theory and Kernel Machines: 16th Annual Conference on Learning Theory and 7th Kernel Workshop, COLT/Kernel 2003, Washington, DC, USA, August 24-27, 2003. Proceedings. Berlin, Heidelberg: Springer Berlin Heidelberg, 2003.
 
