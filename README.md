@@ -1,12 +1,12 @@
 # miss-SNF: a multimodal patient similarity network integration approach to handle completely missing data sources
 
-Precision medicine leverages patient-specific data to improve prevention, diagnosis, prognosis and treatment of diseases. Advancing precision medicine requires the non-trivial integration of complex, heterogeneous and potentially high-dimensional data sources, such as multi-omics and clinical data. 
+Precision medicine leverages patient-specific multimodal data to improve prevention, diagnosis, prognosis and treatment of diseases. Advancing precision medicine requires the non-trivial integration of complex, heterogeneous and potentially high-dimensional data sources, such as multi-omics and clinical data. 
 In literature several  approaches have been proposed to manage missing data, but usually limited to the recovery of subsets of features for a subset of patients. A largely overlooked problem is the integration of multiple sources of data when one or more of them are completely missing for a subset of patients, a relatively common condition  in clinical practice.
 
 We propose miss-Similarity Network Fusion (miss-SNF), a novel general-purpose data integration approach designed to manage completely missing data in the context of patient similarity networks.
 Miss-SNF integrates incomplete unimodal patient similarity networks by leveraging a non-linear message-passing strategy borrowed from the SNF algorithm.  
-Miss-SNF is able to recover patient similarity even with completely missing data sources and it is ``task agnostic'', in the sense that can integrate partial data for both unsupervised and supervised prediction tasks.
-We evaluated miss-SNF on nine cancer datasets from The Cancer Genome Atlas (TCGA) and compared it to representative state-of-the-art integration approaches. Miss-SNF showed superior performance in recovering similarities and achieved competitive clustering results, identifying patients subgroups enriched in clinically relevant variables and showing differential survival. Moreover, we successfully applied the integrated network with completely missing data, for the supervised prediction of the overall survival and progression free interval events.
+Miss-SNF is able to recover missing patient similarities and is ``task agnostic'', in the sense that can integrate partial data for both unsupervised and supervised prediction tasks.
+Experimental analyses on nine cancer datasets from The Cancer Genome Atlas (TCGA) demonstrate that miss-SNF achieves state-of-the-art results in recovering similarities and in identifying patients subgroups enriched in clinically relevant variables and having differential survival. Moreover, amputation experiments show that miss-SNF supervised prediction of the overall survival and progression-free interval events with completely missing data achieves results comparable to those obtained when all the data are available.
 
 <div align="center">
 <img src="./man/figures/miss-SNF_logo.svg" alt="miss-SNF logo" width="275"/>
