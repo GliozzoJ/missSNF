@@ -9,10 +9,10 @@ get.miss.pts(Mall, perc.na = 0.2, miss.symbols = NULL)
 \arguments{
 \item{Mall}{list of named matrices/dataframes (samples x features).}
 
-\item{perc.na}{percentage of NAs above which patient is considered missing.}
+\item{perc.na}{percentage of NAs above which a patient is considered missing.}
 
 \item{miss.symbols}{vector of strings. If not NULL, the provided symbols in
-dataframes is converted to NA.}
+dataframes are converted to NA.}
 }
 \value{
 list of vectors. Each vector contains the names of missing samples

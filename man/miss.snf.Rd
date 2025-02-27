@@ -2,7 +2,7 @@
 % Please edit documentation in R/missSNF.R
 \name{miss.snf}
 \alias{miss.snf}
-\title{miss-SNF: integration of patients' networks considering missing cases}
+\title{miss-SNF: integration of patients' networks considering missing samples}
 \usage{
 miss.snf(
   Mall,
@@ -63,7 +63,7 @@ mode="reconstruct" or mode="one" (def d=1).}
 \item{random.walk}{string. Use 1-step Random Walk to compute the local
 similarity matrix S and/or p-step Random Walk (p>=2) to compute the global
 similarity matrix P. random.walk=c("global", "local", "both", "none") and
-defaults is random.walk="none".}
+default is random.walk="none".}
 
 \item{p}{numeric. Number of steps for the p-step RW. Used only when
 global similarity matrix is computed through p-step Random Walk.}
@@ -72,7 +72,7 @@ global similarity matrix is computed through p-step Random Walk.}
 mode = "random".}
 }
 \value{
-A list with two elements:
+A list with five elements:
 \itemize{
 \item W : integrated similarity matrix. Note that the order of the patients
 is different from the order of the original matrices.
