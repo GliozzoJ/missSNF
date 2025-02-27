@@ -3,7 +3,7 @@
 #' @description Extension of the algorithm Similarity Network Fusion
 #' (\url{https://doi.org/10.1038/nmeth.2810}) able to handle the absence (complete or
 #' nearly complete) of a specific data source for a given patient by:
-#' \\loadmathjax
+#' \loadmathjax
 #' \itemize{
 #' \item "reconstruct strategy" that can partially reconstruct missing
 #'   data by using information from different sources (i.e. miss-SNF ONE).
