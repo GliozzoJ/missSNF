@@ -1,4 +1,4 @@
-#' miss-SNF: integration of patients' networks considering missing cases
+#' miss-SNF: integration of patients' networks considering missing samples
 #'
 #' @description Extension of the algorithm Similarity Network Fusion
 #' (\url{https://doi.org/10.1038/nmeth.2810}) able to handle the absence (complete or
@@ -46,13 +46,13 @@
 #' @param random.walk string. Use 1-step Random Walk to compute the local
 #' similarity matrix S and/or p-step Random Walk (p>=2) to compute the global
 #' similarity matrix P. random.walk=c("global", "local", "both", "none") and
-#' defaults is random.walk="none".
+#' default is random.walk="none".
 #' @param p numeric. Number of steps for the p-step RW. Used only when
 #' global similarity matrix is computed through p-step Random Walk.
 #' @param seed numeric. Seed to get reproducible results. Needed only if
 #' mode = "random".
 #'
-#' @return A list with two elements:
+#' @return A list with five elements:
 #' \itemize{
 #' \item W : integrated similarity matrix. Note that the order of the patients
 #' is different from the order of the original matrices.
@@ -552,9 +552,9 @@ scaled.exp.chi2 <- function(M, kk=20, sigma=0.5){
 #' not present in one matrix but it is present in at least one of the others.
 #'
 #' @param Mall list of named matrices/dataframes (samples x features).
-#' @param perc.na percentage of NAs above which patient is considered missing.
+#' @param perc.na percentage of NAs above which a patient is considered missing.
 #' @param miss.symbols vector of strings. If not NULL, the provided symbols in
-#'                     dataframes is converted to NA.
+#'                     dataframes are converted to NA.
 #'
 #' @return list of vectors. Each vector contains the names of missing samples
 #'         in a specific matrix/dataframe.
