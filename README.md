@@ -38,19 +38,9 @@ install.packages("devtools");
 library("devtools");
 ```
 
-3. Then, you can install miss-SNF (some Bioconductor packages
-has to be installed apart):
+3. Then, you can install miss-SNF:
 
 ```
-# Install BiocManager
-if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-# Install Bioconductor dependencies
-BiocManager::install("RBGL")
-BiocManager::install("graph")
-BiocManager::install("limma")
-
 # Install miss-SNF
 install("./missSNF");
 ```
