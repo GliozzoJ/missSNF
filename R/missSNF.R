@@ -69,6 +69,7 @@
 #' }
 #' @export
 #' @importFrom stats runif
+#' @importFrom mathjaxr preview_rd
 #'
 #' @examples
 #'

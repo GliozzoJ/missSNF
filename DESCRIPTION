@@ -10,6 +10,7 @@ Description: Implementation of miss-Similarity Network Fusion (miss-SNF), a nove
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
+biocViews:
 Imports: SNFtool, NetInt, RANKS, NetPreProc, mathjaxr
 RoxygenNote: 7.3.2
 RdMacros: mathjaxr
