@@ -1,17 +1,15 @@
 Package: missSNF
 Type: Package
-Title: miss-SNF: a multimodal patient similarity network integration approach to handle completely missing data sources
+Title: Miss-SNF: a Multimodal Patient Similarity Network Integration Approach to Handle Completely Missing Data Sources
 Version: 1.0.0
 Authors@R: c(
     person("Jessica", "Gliozzo", email = "jessica.gliozzo@unimi.it", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-7629-8112")),
-    person("Giorgio", "Valentini", email = "giorgio.valentini@unimi.it", role = "ctb", comment = c("0000-0002-5694-3919")),
-    person("Elena", "Casiraghi", email = "elena.casiraghi@unimi.it", role = "ctb", comment = c("0000-0003-2024-7572")),
+    person("Giorgio", "Valentini", email = "giorgio.valentini@unimi.it", role = "ctb", comment = c(ORCID = "0000-0002-5694-3919")),
+    person("Elena", "Casiraghi", email = "elena.casiraghi@unimi.it", role = "ctb", comment = c(ORCID = "0000-0003-2024-7572")),
     person("Mauricio A.", "Soto Gomez", email = "mauricio.soto@unimi.it", role = "ctb", comment = c(ORCID = "0000-0001-5977-9467")))
-Description: Implementation of miss-Similarity Network Fusion (miss-SNF), a novel general-purpose data integration approach designed to manage completely missing data in the context of patient similarity networks. Miss-SNF integrates incomplete unimodal patient similarity networks by leveraging a non-linear message-passing strategy borrowed from the SNF algorithm. Miss-SNF is able to recover patient similarity even with completely missing data sources and it is ''task agnostic'', in the sense that can integrate partial data for both unsupervised and supervised prediction tasks.
+Description: Implementation of miss-Similarity Network Fusion (miss-SNF), a novel general-purpose data integration approach designed to manage completely missing data in the context of patient similarity networks. Miss-SNF integrates incomplete unimodal patient similarity networks by leveraging a non-linear message-passing strategy borrowed from the SNF algorithm (Wang et al. (2014) <doi:10.1038/nmeth.2810>). Miss-SNF is able to recover patient similarity even with completely missing data sources and it is ''task agnostic'', in the sense that can integrate partial data for both unsupervised and supervised prediction tasks.
 License: GPL (>= 3)
 Encoding: UTF-8
-LazyData: true
 biocViews:
-Imports: SNFtool, NetInt, RANKS, NetPreProc, mathjaxr
+Imports: SNFtool, NetInt, RANKS, NetPreProc
 RoxygenNote: 7.3.2
-RdMacros: mathjaxr

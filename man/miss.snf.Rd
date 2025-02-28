@@ -83,24 +83,23 @@ if a patient is considered missing in all data sources).
 global matrices after cross-diffusion, considering consecutive steps.
 \item conv2 : vector containing the Frobenius norm of the difference among the
 integrated matrices at two consecutive steps.
- \item conv3 : vector containing the Frobenius norm of the difference among the
+\item conv3 : vector containing the Frobenius norm of the difference among the
 integrated matrix at each iteration and the final integrated matrix (measures
 convergence velocity).
 }
 }
 \description{
 Extension of the algorithm Similarity Network Fusion
-(\url{https://doi.org/10.1038/nmeth.2810}) able to handle the absence (complete or
+(\url{doi:10.1038/nmeth.2810}) able to handle the absence (complete or
 nearly complete) of a specific data source for a given patient by:
-\loadmathjax
 \itemize{
 \item "reconstruct strategy" that can partially reconstruct missing
-  data by using information from different sources (i.e. miss-SNF ONE).
+data by using information from different sources (i.e. miss-SNF ONE).
 \item "ignore strategy" which simply ignores missing data during the integration
-  process (i.e. miss-SNF ZERO).
+process (i.e. miss-SNF ZERO).
 \item "equidistant strategy", similar to reconstruct but sets the similarity
 of the partial samples with the others to a fixed value instead of zero.
-\item "random strategy" that sets the similatiry randomly.
+\item "random strategy" that sets the similarity randomly.
 }
 }
 \examples{
