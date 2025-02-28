@@ -17,14 +17,14 @@ Experimental analyses on nine cancer datasets from The Cancer Genome Atlas (TCGA
 The "miss-SNF" package can be installed using devtools. Please
 follow these steps:
 
-0. Download or clone miss-SNF package from this repository.
+0. Download from [github](https://github.com/AnacletoLAB/missSNF) or zenodo (doi:10.5281/zenodo.14945615) this repository. Alternatively, you can clone the repository from github using the following command:
 
 ```
 # Code to clone repository
 git clone https://github.com/AnacletoLAB/missSNF.git
 ```
 
-You can download the compressed _.zip_ file containing this repository using the "< > Code" button (decompress the folder before installation).
+You can download the compressed _.zip_ file containing this repository using the "< > Code" button in github (always decompress the folder before installation).
 
 1. Install devtools using:
 
